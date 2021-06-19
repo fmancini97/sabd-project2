@@ -18,6 +18,15 @@ services:
     depends_on:
       - zookeeper
 
+  producer:
+    image: fmancini/producer
+    build:
+      context: ./producer
+    environment:
+      - "TIME_RANGE=6"
+    depends_on:
+      - kafka
+
   jobmanager:
     image: flink:latest
     container_name: jobmanager

@@ -1,62 +1,66 @@
 package it.uniroma2.ing.dicii.sabd;
 
-import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.protocol.types.Field;
-import org.apache.kafka.common.serialization.LongDeserializer;
 import org.apache.kafka.common.serialization.LongSerializer;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Hello world!
  *
  */
-public class Injector
-{
+public class Injector {
+    private static final SimpleDateFormat[] dateFormats = {new SimpleDateFormat("dd/MM/yy HH:mm"),
+            new SimpleDateFormat("dd-MM-yy HH:mm")};
+    private static final String bootstrapServer = "kafka:9092";
+    private static final String producerId = "dataInjector";
+    private static final String topic = "flink";
+    private static final String datasetPath = "/data/dataset.csv";
+
+
     public static void main( String[] args ) {
 
-        Long range = 30 * 60000L;
+        Logger log = Logger.getLogger(Injector.class.getSimpleName());
 
-        SimpleDateFormat[] dateFormats = {new SimpleDateFormat("dd/MM/yy HH:mm"),
-                new SimpleDateFormat("dd-MM-yy HH:mm")};
+        log.info("Parsing parameter");
 
-        Properties props = new Properties();
-        // specify brokers
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        // set consumer group id
-        props.put(ProducerConfig.CLIENT_ID_CONFIG, "flink-producer");
-        // start reading from beginning of partition if no offset was created
-        // exactly once semantic
-        // key and value deserializers
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, LongSerializer.class.getName());
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        if (args.length == 0) {
+            log.log(Level.WARNING, "Usage: {0} <minutes>", Injector.class.getName());
+            System.exit(-1);
+        }
 
+        long timeRange = 0;
+        try {
+            timeRange = Long.parseLong(args[0]);
+        } catch (NumberFormatException e) {
+            log.log(Level.WARNING, "Wrong number format: {0}", args[0]);
+            System.exit(-1);
+        }
 
+        log.log(Level.INFO, "Starting Injector with timeRange = {0} minutes", timeRange);
 
-        System.out.println("Reading file");
-        BufferedReader reader = null;
+        // Converting timeRange from minutes to milliseconds
+        timeRange = timeRange * 60 * 1000;
+
+        log.info("Reading data from file");
         Map<Long, List<String>> map = new TreeMap<>();
-        Long min = Long.MAX_VALUE;
-        Long max = Long.MIN_VALUE;
-
-
+        long min = Long.MAX_VALUE;
+        long max = Long.MIN_VALUE;
 
         try {
-            reader = new BufferedReader(new FileReader("data/dataset.csv"));
+            BufferedReader reader = new BufferedReader(new FileReader(Injector.datasetPath));
             String line;
             reader.readLine(); //read header
             while ((line = reader.readLine()) != null) {
@@ -70,72 +74,64 @@ public class Injector
                     } catch (ParseException ignored) { }
                 }
 
-
                 if (timestamp == null) {
-                    System.out.println("Erroreeeeee!!!!!");
-                    return;
+                    log.log(Level.SEVERE, "Unable to parse the date: {0}", dateString);
+                    System.exit(-1);
                 }
-
-                System.out.println(timestamp);
 
                 min = (min < timestamp) ? min : timestamp;
                 max = (max > timestamp) ? max : timestamp;
-
                 List<String> records = map.computeIfAbsent(timestamp, k -> new ArrayList<>());
                 records.add(line);
-
             }
             reader.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, "Error while reading file: {0}", e.getMessage());
         }
 
-        Double proportion = range / (double) (max - min);
+        Properties props = new Properties();
+        // specify brokers
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, Injector.bootstrapServer);
+        // set consumer group id
+        props.put(ProducerConfig.CLIENT_ID_CONFIG, Injector.producerId);
+        // key and value deserializers
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, LongSerializer.class.getName());
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 
         Producer<Long, String> producer = new KafkaProducer<>(props);
 
         Set<Map.Entry<Long, List<String>>> timeSet = map.entrySet();
 
-
+        double proportion = timeRange / (double) (max - min);
+        long recordsSent = 0L;
         Long previous = null;
-        System.out.println(max - min);
-        Long sum = 0L;
 
+        log.info("Starting sending records");
         for (Map.Entry<Long, List<String>> entry: timeSet) {
             Long timestamp = entry.getKey();
 
             if (previous != null) {
                 try {
-
-
                     long sleepTime =  (long) ((timestamp - previous) * proportion);
-                    sum += sleepTime;
-                    System.out.println(sleepTime);
-
                     TimeUnit.MILLISECONDS.sleep(sleepTime);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    log.log(Level.WARNING, "Error while thread was sleeping: {0}", e.getMessage());
                 }
             }
-            System.out.println(timestamp);
 
-
-            ProducerRecord<Long, String> producerRecord = new ProducerRecord<>("flink", timestamp, "ciao");
-
-            producer.send(producerRecord, (recordMetadata, e) -> {e.printStackTrace();});
-            /*
             for (String record : entry.getValue()) {
-
-                ProducerRecord<Long, String> producerRecord = new ProducerRecord<>("flink", timestamp, record);
-
-                System.out.println(record);
-                producer.send(producerRecord, (recordMetadata, e) -> {e.printStackTrace();});
-            }*/
-            producer.flush();
-
+                ProducerRecord<Long, String> producerRecord = new ProducerRecord<>(Injector.topic, null,
+                        timestamp, timestamp, record);
+                producer.send(producerRecord);
+                recordsSent += 1;
+                if (recordsSent % 500 == 0) log.log(Level.INFO, "{0} records sent", recordsSent);
+            }
             previous = timestamp;
         }
 
-        System.out.println( "Hello World! " + sum );
+        producer.flush();
+        producer.close();
+        log.info("Records sent");
+
     }
 }
