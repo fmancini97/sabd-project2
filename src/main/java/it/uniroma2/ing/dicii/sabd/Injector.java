@@ -1,11 +1,9 @@
 package it.uniroma2.ing.dicii.sabd;
 
+import it.uniroma2.ing.dicii.sabd.Utils.KafkaProperties;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.serialization.LongSerializer;
-import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -26,16 +24,17 @@ public class Injector {
             new SimpleDateFormat("dd-MM-yy HH:mm")};
     private static final String bootstrapServer = "kafka:9092";
     private static final String producerId = "dataInjector";
-    private static final String topic = "flink";
     private static final String datasetPath = "/data/dataset.csv";
 
 
     public static void main( String[] args ) {
 
+        final long range = 5 * 60 * 1000L;
         Logger log = Logger.getLogger(Injector.class.getSimpleName());
 
         log.info("Parsing parameter");
 
+        Properties props = KafkaProperties.getInjectorProperties();
         if (args.length == 0) {
             log.log(Level.WARNING, "Usage: {0} <minutes>", Injector.class.getName());
             System.exit(-1);
@@ -59,6 +58,8 @@ public class Injector {
         long min = Long.MAX_VALUE;
         long max = Long.MIN_VALUE;
 
+
+
         try {
             BufferedReader reader = new BufferedReader(new FileReader(Injector.datasetPath));
             String line;
@@ -66,6 +67,7 @@ public class Injector {
             while ((line = reader.readLine()) != null) {
                 String[] values = line.split(",");
                 String dateString = values[7];
+
                 Long timestamp = null;
                 for (SimpleDateFormat dateFormat: dateFormats) {
                     try {
@@ -89,14 +91,6 @@ public class Injector {
             log.log(Level.SEVERE, "Error while reading file: {0}", e.getMessage());
         }
 
-        Properties props = new Properties();
-        // specify brokers
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, Injector.bootstrapServer);
-        // set consumer group id
-        props.put(ProducerConfig.CLIENT_ID_CONFIG, Injector.producerId);
-        // key and value deserializers
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, LongSerializer.class.getName());
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 
         Producer<Long, String> producer = new KafkaProducer<>(props);
 
@@ -119,19 +113,19 @@ public class Injector {
                 }
             }
 
+
             for (String record : entry.getValue()) {
-                ProducerRecord<Long, String> producerRecord = new ProducerRecord<>(Injector.topic, null,
-                        timestamp, timestamp, record);
-                producer.send(producerRecord);
-                recordsSent += 1;
-                if (recordsSent % 500 == 0) log.log(Level.INFO, "{0} records sent", recordsSent);
+
+                ProducerRecord<Long, String> producerRecord = new ProducerRecord<>(KafkaProperties.SOURCE_TOPIC, timestamp, record);
+
+                System.out.println(record);
+                producer.send(producerRecord, (recordMetadata, e) -> {e.printStackTrace();});
             }
+
+
             previous = timestamp;
         }
-
         producer.flush();
-        producer.close();
-        log.info("Records sent");
 
     }
 }

@@ -1,5 +1,6 @@
 package it.uniroma2.ing.dicii.sabd;
 
+import it.uniroma2.ing.dicii.sabd.Utils.KafkaProperties;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.protocol.types.Field;
 import org.apache.kafka.common.serialization.LongDeserializer;
@@ -15,23 +16,10 @@ public class Reader {
     public static void main(String[] args) {
 
 
-        Properties props = new Properties();
+        Properties props = KafkaProperties.getCSVWriterProperties();
 
-
-        // specify brokers
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        // set consumer group id
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "consumer");
-        // start reading from beginning of partition if no offset was created
-        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        // exactly once semantic
-
-        // key and value deserializers
-        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, LongDeserializer.class.getName());
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-
-        Consumer<Long, String> consumer = new KafkaConsumer<Long, String>(props);
-        consumer.subscribe(Collections.singletonList("flink"));
+        Consumer<Long, String> consumer = new KafkaConsumer<>(props);
+        consumer.subscribe(Collections.singletonList(KafkaProperties.QUERY1_WEEKLY_TOPIC));
         while (true) {
             final ConsumerRecords<Long, String> consumerRecords = consumer.poll(Duration.ofMillis(1000));
             if (consumerRecords.count() == 0) {
