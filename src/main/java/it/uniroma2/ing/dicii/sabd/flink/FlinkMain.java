@@ -2,6 +2,7 @@ package it.uniroma2.ing.dicii.sabd.flink;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.Properties;
 
 
@@ -13,10 +14,13 @@ import org.apache.flink.api.common.eventtime.WatermarkGeneratorSupplier;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
+import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
+import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.AscendingTimestampExtractor;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.util.Collector;
 
@@ -29,15 +33,14 @@ public class FlinkMain {
     public static void main(String[] args){
 
         //setup flink environment
-        Configuration conf = new Configuration();
-        StreamExecutionEnvironment environment = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(conf);
+        StreamExecutionEnvironment environment = StreamExecutionEnvironment.getExecutionEnvironment();
 
 
         Properties props = KafkaProperties.getFlinkConsumerProperties();
-
+        FlinkKafkaConsumer<String> consumer = new FlinkKafkaConsumer<>(KafkaProperties.SOURCE_TOPIC, new SimpleStringSchema(), props);
 
         DataStream<Tuple2<Long, String>> stream = environment
-                .addSource(new FlinkKafkaConsumer<>(KafkaProperties.SOURCE_TOPIC, new SimpleStringSchema(), props))
+                .addSource(consumer)
                 .flatMap(new FlatMapFunction<String, Tuple2<Long, String>>() {
                     @Override
                     public void flatMap(String s, Collector<Tuple2<Long, String>> collector) {
@@ -60,12 +63,8 @@ public class FlinkMain {
                         collector.collect(new Tuple2<>(timestamp, s));
 
                     }
-                }).assignTimestampsAndWatermarks(new WatermarkStrategy<Tuple2<Long, String>>() {
-                    @Override
-                    public WatermarkGenerator<Tuple2<Long, String>> createWatermarkGenerator(WatermarkGeneratorSupplier.Context context) {
-                        return new AscendingTimestampsWatermarks<>();
-                    }
-                })
+                }).assignTimestampsAndWatermarks(WatermarkStrategy.<Tuple2<Long,String>>forBoundedOutOfOrderness(Duration.ofMinutes(1))
+                .withTimestampAssigner((event,timestamp) -> event.f0))
                 .name("stream-source");
 
         Query1Structure.build(stream);
@@ -81,6 +80,14 @@ public class FlinkMain {
 }
 
 /*
+.assignTimestampsAndWatermarks(new WatermarkStrategy<Tuple2<Long, String>>() {
+                    @Override
+                    public WatermarkGenerator<Tuple2<Long, String>> createWatermarkGenerator(WatermarkGeneratorSupplier.Context context) {
+                        return new AscendingTimestampsWatermarks<>();
+                    }
+                })
+
+
  .assignTimestampsAndWatermarks(new AscendingTimestampExtractor<Tuple2<Long, String>>() {
                     @Override
                     public long extractAscendingTimestamp(Tuple2<Long, String> tuple) {

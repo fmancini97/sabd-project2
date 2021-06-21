@@ -7,6 +7,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -22,9 +23,7 @@ import java.util.logging.Logger;
 public class Injector {
     private static final SimpleDateFormat[] dateFormats = {new SimpleDateFormat("dd/MM/yy HH:mm"),
             new SimpleDateFormat("dd-MM-yy HH:mm")};
-    private static final String bootstrapServer = "kafka:9092";
-    private static final String producerId = "dataInjector";
-    private static final String datasetPath = "/data/dataset.csv";
+    private static final String datasetPath = "dataset.csv";
 
 
     public static void main( String[] args ) {
@@ -116,7 +115,7 @@ public class Injector {
 
             for (String record : entry.getValue()) {
 
-                ProducerRecord<Long, String> producerRecord = new ProducerRecord<>(KafkaProperties.SOURCE_TOPIC, timestamp, record);
+                ProducerRecord<Long, String> producerRecord = new ProducerRecord<>(KafkaProperties.SOURCE_TOPIC, 0, timestamp, timestamp, record);
 
                 System.out.println(record);
                 producer.send(producerRecord, (recordMetadata, e) -> {e.printStackTrace();});

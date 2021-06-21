@@ -7,6 +7,7 @@ public class Query1Aggregator implements AggregateFunction<TripData, Query1Accum
 
     @Override
     public Query1Accumulator createAccumulator() {
+        System.out.println("query1aggregator 10");
         return new Query1Accumulator();
     }
 

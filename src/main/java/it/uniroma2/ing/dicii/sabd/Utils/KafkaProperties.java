@@ -14,11 +14,12 @@ public class KafkaProperties {
 
     public static final String SOURCE_TOPIC = "source";
     public static final String QUERY1_WEEKLY_TOPIC = "query1Weekly";
+    public static final String KAFKA_ADDRESS = "localhost:9092";
 
     public static Properties getInjectorProperties(){
         Properties props = new Properties();
         // specify brokers
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_ADDRESS);
         // set consumer group id
         props.put(ProducerConfig.CLIENT_ID_CONFIG, "flink-producer");
         // start reading from beginning of partition if no offset was created
@@ -32,7 +33,7 @@ public class KafkaProperties {
     public static Properties getFlinkConsumerProperties(){
         Properties props = new Properties();
         // specify brokers
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_ADDRESS);
         // set consumer group id
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "flink1");
         // start reading from beginning of partition if no offset was created
@@ -49,7 +50,7 @@ public class KafkaProperties {
     public static Properties getFlinkProducerProperties(){
         Properties props = new Properties();
         // specify brokers
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_ADDRESS);
         // set producer id
         props.put(ProducerConfig.CLIENT_ID_CONFIG, "producer");
         // exactly once semantic
@@ -61,7 +62,7 @@ public class KafkaProperties {
     public static Properties getCSVWriterProperties(){
         Properties props = new Properties();
         // specify brokers
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA_ADDRESS);
         // set consumer group id
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "consumer");
         // start reading from beginning of partition if no offset was created

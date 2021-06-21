@@ -17,9 +17,6 @@ public class Query1Accumulator {
 
     public Query1Accumulator(){
         this.cellsMap = new HashMap<>();
-
-
-
     }
 
     public Query1Accumulator(HashMap<String, Map<String, Set<String>>> cellsMap){
