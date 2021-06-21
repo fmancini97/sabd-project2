@@ -3,11 +3,10 @@ package it.uniroma2.ing.dicii.sabd.flink.query1;
 import it.uniroma2.ing.dicii.sabd.TripData;
 import it.uniroma2.ing.dicii.sabd.Utils.KafkaProperties;
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.java.functions.KeySelector;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
-import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 import org.apache.flink.util.Collector;
@@ -34,106 +33,26 @@ public class Query1Structure {
         }).name("stream-query1");
 
         Properties props = KafkaProperties.getFlinkProducerProperties();
-    //    stream.keyBy((KeySelector<TripData, String>) TripData::getCell);
-        stream.keyBy((KeySelector<TripData, String>) TripData::getCell).window(TumblingProcessingTimeWindows.of(Time.days(7), Time.days(-3)))
-                .aggregate(new Query1Aggregator())
-                .name("query1Weekly")
-                .flatMap(new FlatMapFunction<Query1Outcome, String>() {
-                    @Override
-                    public void flatMap(Query1Outcome query1Outcome, Collector<String> collector) throws Exception {
-                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                        System.out.println("marameo");
-                        query1Outcome.getCellsMap().forEach((k1,v1)-> v1.forEach((k2,v2) ->
-                                {
-                                    double dato = (double)v2/7;
-                                //    String meanWeekly = String.format("%.2g%n",(double)v2/7);
-                                    String line = simpleDateFormat.format(query1Outcome.getDate()) + "," +
-                                            k1 + "," + k2 + "," + dato;
-                                    collector.collect(line);
-                                }
-                        ));
-                    }
-                }).addSink(new FlinkKafkaProducer<>(KafkaProperties.QUERY1_WEEKLY_TOPIC,
-                new FlinkOutputSerializer(KafkaProperties.QUERY1_WEEKLY_TOPIC),
-                props, FlinkKafkaProducer.Semantic.EXACTLY_ONCE))
-                .name("query1WeeklySink");
-
-
-    /*
-        stream.keyBy(TripData::getCell).window(TumblingProcessingTimeWindows.of(Time.days(7), Time.days(-3)))
-                .allowedLateness(Time.hours(1))
-                .aggregate(new Query1Aggregator())
-                .name("query1Weekly")
-                .flatMap(new FlatMapFunction<Query1Outcome, String>() {
-                    @Override
-                    public void flatMap(Query1Outcome query1Outcome, Collector<String> collector) throws Exception {
-                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                        query1Outcome.getCellsMap().forEach((k1,v1)-> v1.forEach((k2,v2) ->
-                                {
-                                    String meanWeekly = String.format("%.2g%n",(double)v2/7);
-                                    String line = simpleDateFormat.format(query1Outcome.getDate()) + "," +
-                                            k1 + "," + k2 + "," + meanWeekly;
-                                    collector.collect(line);
-                                }
-                        ));
-                    }
-                }).addSink(new FlinkKafkaProducer<>(KafkaProperties.QUERY1_WEEKLY_TOPIC,
-                new FlinkOutputSerializer(KafkaProperties.QUERY1_WEEKLY_TOPIC),
-                props, FlinkKafkaProducer.Semantic.EXACTLY_ONCE))
-                .name("query1WeeklySink");
-
-*/
-        /*
-        // 1 week
-        stream.keyBy(TripData::getCell).window(TumblingProcessingTimeWindows.of(Time.days(7), Time.days(-3)))
-                .allowedLateness(Time.hours(1))
-                .aggregate(new Query1Aggregator())
-                .name("query1Weekly")
-                .flatMap(new FlatMapFunction<Query1Outcome, String>() {
-                    @Override
-                    public void flatMap(Query1Outcome query1Outcome, Collector<String> collector) throws Exception {
-                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                        query1Outcome.getCellsMap().forEach((k1,v1)-> v1.forEach((k2,v2) ->
-                                {
-                                    String meanWeekly = String.format("%.2g%n",(double)v2/7);
-                                    String line = simpleDateFormat.format(query1Outcome.getDate()) + "," +
-                                            k1 + "," + k2 + "," + meanWeekly;
-                                    collector.collect(line);
-                                }
-                        ));
-                    }
-                }).addSink(new FlinkKafkaProducer<>(KafkaProperties.QUERY1_WEEKLY_TOPIC,
-                        new FlinkOutputSerializer(KafkaProperties.QUERY1_WEEKLY_TOPIC),
-                        props, FlinkKafkaProducer.Semantic.EXACTLY_ONCE))
-                .name("query1WeeklySink");
-        */
-
-        /*
-
-
-        stream.windowAll(TumblingEventTimeWindows.of(Time.days(7), Time.days(-3)))
+        stream.keyBy(TripData::getCell)
+                .window(TumblingEventTimeWindows.of(Time.days(7), Time.days(-3)))
                 .aggregate(new Query1Aggregator(), new Query1Window())
                 .name("query1Weekly")
-                .flatMap(new FlatMapFunction<Query1Outcome, String>() {
-                    @Override
-                    public void flatMap(Query1Outcome query1Outcome, Collector<String> collector) throws Exception {
-                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                        query1Outcome.getCellsMap().forEach((k1,v1)-> v1.forEach((k2,v2) ->
-                                {
-                                    double dato = (double)v2/7;
-                                  //  String meanWeekly = String.format("%.2g%n",(double)v2/7);
-                                    String line = simpleDateFormat.format(query1Outcome.getDate()) + "," +
-                                            k1 + "," + k2 + "," + dato;
-                                    collector.collect(line);
-                                }
-                        ));
-                    }
+                .map((MapFunction<Query1Outcome, String>) query1Outcome -> {
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+                    StringBuilder builder = new StringBuilder();
+
+                    builder.append(simpleDateFormat.format(query1Outcome.getDate()))
+                            .append(",").append(query1Outcome.getCellId());
+
+                    query1Outcome.getTypeMap().forEach((k,v) -> {
+                        builder.append(",").append(k).append(",").append(String.format("%.2g",(double)v/7));
+                    });
+                    return builder.toString();
                 })
                 .addSink(new FlinkKafkaProducer<>(KafkaProperties.QUERY1_WEEKLY_TOPIC,
-                        new FlinkOutputSerializer(KafkaProperties.QUERY1_WEEKLY_TOPIC),
-                        props, FlinkKafkaProducer.Semantic.EXACTLY_ONCE))
+                new FlinkOutputSerializer(KafkaProperties.QUERY1_WEEKLY_TOPIC),
+                props, FlinkKafkaProducer.Semantic.EXACTLY_ONCE))
                 .name("query1WeeklySink");
-*/
-
     }
 }

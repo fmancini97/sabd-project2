@@ -101,7 +101,11 @@ public class TripData {
         return shipType;
     }
 
+    public void setCell(String cell) {
+        this.cell = cell;
+    }
 
-
-
+    public void setShipType(String shipType) {
+        this.shipType = shipType;
+    }
 }

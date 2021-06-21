@@ -1,60 +1,45 @@
 package it.uniroma2.ing.dicii.sabd.flink.query1;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class Query1Accumulator {
+public class Query1Accumulator implements Serializable {
 
-    //mappa (cella - (tiponave - set(tripid)))
-    private HashMap<String, Map<String, Set<String>>> cellsMap;
+    //mappa (tiponave - set(tripid))
+    private Map<String, Set<String>> typeMap;
 
-    public HashMap<String, Map<String, Set<String>>> getCellsMap() {
-        return cellsMap;
-    }
-
-    public void setCellsMap(HashMap<String, Map<String, Set<String>>> cellsMap) {
-        this.cellsMap = cellsMap;
-    }
 
     public Query1Accumulator(){
-        this.cellsMap = new HashMap<>();
+        this.typeMap = new HashMap<>();
     }
 
-    public Query1Accumulator(HashMap<String, Map<String, Set<String>>> cellsMap){
-        this.cellsMap = cellsMap;
+    public Query1Accumulator(Map<String, Set<String>> typeMap) {
+        this.typeMap = typeMap;
     }
 
-    public void add(String cell, String shipType, Set<String> tripsSet){
+    public void add(String shipType, Set<String> tripsSet){
         for (String tripId : tripsSet) {
-            add(cell, shipType, tripId);
+            add(shipType, tripId);
         }
     }
 
-    public void add(String cell, String shipType, String tripId){
-        Map<String, Set<String>> setsForCell = cellsMap.get(cell);
+    public void add(String shipType, String tripId){
+        Set<String> typeSet = typeMap.get(shipType);
+        //cell found but shipType not found in that cell
+        if(typeSet == null){
+            typeSet = new HashSet<>();
+        }  //update value
 
-        //cell not found
-        if(setsForCell == null){
-            HashMap<String, Set<String>> shiptypeCounters = new HashMap<>();
-            Set<String> tripSet = new HashSet<>();
-            tripSet.add(tripId);
-            shiptypeCounters.put(shipType, tripSet);
-            this.cellsMap.put(cell, shiptypeCounters);
-        } else {
-            Set<String> tripSet = setsForCell.get(shipType);
-            //cell found but shipType not found in that cell
-            if(tripSet == null){
-                tripSet = new HashSet<>();
-                tripSet.add(tripId);
-                setsForCell.put(shipType, tripSet);
-            } else {
-                //update value
-                tripSet.add(tripId);
-                setsForCell.put(shipType, tripSet);
-                this.cellsMap.put(cell, setsForCell);
-            }
-        }
+        typeSet.add(tripId);
+        typeMap.put(shipType, typeSet);
     }
 
 
+    public Map<String, Set<String>> getTypeMap() {
+        return typeMap;
+    }
 
+    public void setTypeMap(Map<String, Set<String>> typeMap) {
+        this.typeMap = typeMap;
+    }
 }

@@ -39,6 +39,8 @@ public class FlinkMain {
         Properties props = KafkaProperties.getFlinkConsumerProperties();
         FlinkKafkaConsumer<String> consumer = new FlinkKafkaConsumer<>(KafkaProperties.SOURCE_TOPIC, new SimpleStringSchema(), props);
 
+        consumer.assignTimestampsAndWatermarks(WatermarkStrategy.forBoundedOutOfOrderness(Duration.ofMinutes(1)));
+
         DataStream<Tuple2<Long, String>> stream = environment
                 .addSource(consumer)
                 .flatMap(new FlatMapFunction<String, Tuple2<Long, String>>() {
@@ -63,9 +65,16 @@ public class FlinkMain {
                         collector.collect(new Tuple2<>(timestamp, s));
 
                     }
-                }).assignTimestampsAndWatermarks(WatermarkStrategy.<Tuple2<Long,String>>forBoundedOutOfOrderness(Duration.ofMinutes(1))
-                .withTimestampAssigner((event,timestamp) -> event.f0))
+                })/*.assignTimestampsAndWatermarks(WatermarkStrategy.<Tuple2<Long,String>>forBoundedOutOfOrderness(Duration.ofMinutes(1))
+                        .withTimestampAssigner((event,timestamp) -> event.f0))*/
                 .name("stream-source");
+
+                /*.assignTimestampsAndWatermarks(WatermarkStrategy.<Tuple2<Long,String>>forBoundedOutOfOrderness(Duration.ofMinutes(1))
+                .withTimestampAssigner((event,timestamp) -> {
+                    System.out.println(event.f0);
+                    return event.f0;
+                }))
+                .name("stream-source");*/
 
         Query1Structure.build(stream);
 

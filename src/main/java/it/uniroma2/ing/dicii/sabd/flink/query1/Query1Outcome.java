@@ -7,34 +7,46 @@ import java.util.Set;
 
 public class Query1Outcome {
 
-    private HashMap<String, Map<String, Integer>> cellsMap;
-    Date date;
+    private Map<String, Integer> typeMap;
+    private Date date;
+    private String cellId;
 
-    public void setDate(Date date){
-        this.date = date;
+    public Query1Outcome() {
     }
 
-    public Date getDate(){
-        return date;
-    }
-
-    public HashMap<String, Map<String, Integer>> getCellsMap() {
-        return cellsMap;
-    }
-
-    public Query1Outcome(){
-        this.cellsMap = new HashMap<>();
-    }
-
-    public Query1Outcome(HashMap<String, Map<String, Set<String>>> cellsMapInput){
-        this.cellsMap = new HashMap<>();
-        for(String cell: cellsMapInput.keySet()){
-            for(String shipType: cellsMapInput.get(cell).keySet()){
-               HashMap<String,Integer> shipTypeCounterMap = new HashMap<>();
-               shipTypeCounterMap.put(shipType, cellsMapInput.get(cell).get(shipType).size());
-               cellsMap.put(cell, shipTypeCounterMap);
-            }
+    public Query1Outcome(Map<String, Set<String>> typeMapInput){
+        this.typeMap = new HashMap<>();
+        for(String shipType: typeMapInput.keySet()){
+            this.typeMap.put(shipType, typeMapInput.get(shipType).size());
         }
     }
 
+    public Query1Outcome(Map<String, Integer> typeMap, Date date) {
+        this.typeMap = typeMap;
+        this.date = date;
+    }
+
+    public Map<String, Integer> getTypeMap() {
+        return typeMap;
+    }
+
+    public void setTypeMap(Map<String, Integer> typeMap) {
+        this.typeMap = typeMap;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public String getCellId() {
+        return cellId;
+    }
+
+    public void setCellId(String cellId) {
+        this.cellId = cellId;
+    }
 }
