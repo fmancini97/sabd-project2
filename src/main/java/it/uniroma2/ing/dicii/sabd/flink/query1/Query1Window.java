@@ -11,7 +11,7 @@ public class Query1Window
         extends ProcessWindowFunction<Query1Outcome, Query1Outcome, String, TimeWindow> {
 
     @Override
-    public void process(String key, Context context, Iterable<Query1Outcome> iterable, Collector<Query1Outcome> collector) throws Exception {
+    public void process(String key, Context context, Iterable<Query1Outcome> iterable, Collector<Query1Outcome> collector) {
         Query1Outcome query1Outcome = iterable.iterator().next();
         query1Outcome.setDate(new Date(context.window().getStart()));
         query1Outcome.setCellId(key);

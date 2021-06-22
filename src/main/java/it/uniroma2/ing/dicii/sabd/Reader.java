@@ -19,7 +19,7 @@ public class Reader {
         Properties props = KafkaProperties.getCSVWriterProperties();
 
         Consumer<Long, String> consumer = new KafkaConsumer<>(props);
-        consumer.subscribe(Collections.singletonList(KafkaProperties.QUERY1_WEEKLY_TOPIC));
+        consumer.subscribe(Collections.singletonList(KafkaProperties.QUERY1_TOPIC+ "Monthly"));
         while (true) {
             final ConsumerRecords<Long, String> consumerRecords = consumer.poll(Duration.ofMillis(1000));
             if (consumerRecords.count() == 0) {

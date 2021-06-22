@@ -1,5 +1,6 @@
 package it.uniroma2.ing.dicii.sabd.flink;
 
+import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -7,6 +8,7 @@ import java.util.Properties;
 
 
 import it.uniroma2.ing.dicii.sabd.Utils.KafkaProperties;
+import it.uniroma2.ing.dicii.sabd.Utils.TimeIntervalEnum;
 import it.uniroma2.ing.dicii.sabd.flink.query1.Query1Structure;
 import org.apache.flink.api.common.eventtime.AscendingTimestampsWatermarks;
 import org.apache.flink.api.common.eventtime.WatermarkGenerator;
@@ -76,7 +78,15 @@ public class FlinkMain {
                 }))
                 .name("stream-source");*/
 
-        Query1Structure.build(stream);
+        for(TimeIntervalEnum timeIntervalEnum: TimeIntervalEnum.values()){
+            try {
+                Query1Structure.build(stream, timeIntervalEnum);
+                //Query2Structure.build(stream,timeIntervalEnum);
+            } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+        }
+
 
         try {
             environment.execute();

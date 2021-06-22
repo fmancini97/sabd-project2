@@ -13,7 +13,7 @@ public class KafkaProperties {
 
 
     public static final String SOURCE_TOPIC = "source";
-    public static final String QUERY1_WEEKLY_TOPIC = "query1Weekly";
+    public static final String QUERY1_TOPIC = "query1";
     public static final String KAFKA_ADDRESS = "localhost:9092";
 
     public static Properties getInjectorProperties(){
