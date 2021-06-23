@@ -1,13 +1,9 @@
 package it.uniroma2.ing.dicii.sabd;
 
+import it.uniroma2.ing.dicii.sabd.utils.GridHandler;
+
 public class TripData {
 
-    private static final double minLat = 32.0;
-    private static final double maxLat = 45.0;
-    private static final int stepsLat = 10;
-    private static final double minLon = -6.0;
-    private static final double maxLon = 37.0;
-    private static final int stepsLon = 40;
 
     String tripId;
     String shipId;
@@ -16,8 +12,17 @@ public class TripData {
     long timestamp;
     String cell;
     String shipType;
+    long dateAsTimestamp;
 
-    public TripData(String tripId, String shipId, double lon, double lat, long timestamp, int shipType) {
+    public long getDateAsTimestamp() {
+        return dateAsTimestamp;
+    }
+
+    public void setDateAsTimestamp(long dateAsTimestamp) {
+        this.dateAsTimestamp = dateAsTimestamp;
+    }
+
+    public TripData(String tripId, String shipId, double lon, double lat, long timestamp, int shipType, long dateAsTimestamp) {
         this.tripId = tripId;
         this.shipId = shipId;
         this.lon = lon;
@@ -25,6 +30,7 @@ public class TripData {
         this.timestamp = timestamp;
         this.shipType = setShipType(shipType);
         this.cell = computeCell(lat, lon);
+        this.dateAsTimestamp = dateAsTimestamp;
     }
 
     private String setShipType(int shipType){
@@ -40,17 +46,7 @@ public class TripData {
     }
 
     private String computeCell(double lat, double lon){
-        char latId = 'A';
-        double stepWidthLat = (maxLat-minLat)/stepsLat;
-        int positionLat = (int)((lat-minLat)/stepWidthLat);
-        latId += positionLat;
-
-        int lonId = 1;
-        double stepWidthLon = (maxLon-minLon)/stepsLon;
-        int positionLon = (int)((lon-minLon)/stepWidthLon);
-        lonId += positionLon;
-
-        return "" + latId + lonId;
+        return GridHandler.computeCell(lat,lon);
     }
 
     public String getCell(){

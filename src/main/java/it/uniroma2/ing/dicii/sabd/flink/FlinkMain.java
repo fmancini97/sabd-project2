@@ -7,30 +7,25 @@ import java.time.Duration;
 import java.util.Properties;
 
 
-import it.uniroma2.ing.dicii.sabd.Utils.KafkaProperties;
-import it.uniroma2.ing.dicii.sabd.Utils.TimeIntervalEnum;
-import it.uniroma2.ing.dicii.sabd.flink.query1.Query1Structure;
-import org.apache.flink.api.common.eventtime.AscendingTimestampsWatermarks;
-import org.apache.flink.api.common.eventtime.WatermarkGenerator;
-import org.apache.flink.api.common.eventtime.WatermarkGeneratorSupplier;
+import it.uniroma2.ing.dicii.sabd.utils.KafkaProperties;
+import it.uniroma2.ing.dicii.sabd.utils.TimeIntervalEnum;
+import it.uniroma2.ing.dicii.sabd.flink.query2.Query2Structure;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
-import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.configuration.Configuration;
-import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.AscendingTimestampExtractor;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.util.Collector;
 
 
 public class FlinkMain {
 
+
     static SimpleDateFormat[] dateFormats = {new SimpleDateFormat("dd/MM/yy HH:mm"),
             new SimpleDateFormat("dd-MM-yy HH:mm")};
+
 
     public static void main(String[] args){
 
@@ -67,21 +62,15 @@ public class FlinkMain {
                         collector.collect(new Tuple2<>(timestamp, s));
 
                     }
-                })/*.assignTimestampsAndWatermarks(WatermarkStrategy.<Tuple2<Long,String>>forBoundedOutOfOrderness(Duration.ofMinutes(1))
-                        .withTimestampAssigner((event,timestamp) -> event.f0))*/
+                })
                 .name("stream-source");
 
-                /*.assignTimestampsAndWatermarks(WatermarkStrategy.<Tuple2<Long,String>>forBoundedOutOfOrderness(Duration.ofMinutes(1))
-                .withTimestampAssigner((event,timestamp) -> {
-                    System.out.println(event.f0);
-                    return event.f0;
-                }))
-                .name("stream-source");*/
+
 
         for(TimeIntervalEnum timeIntervalEnum: TimeIntervalEnum.values()){
             try {
-                Query1Structure.build(stream, timeIntervalEnum);
-                //Query2Structure.build(stream,timeIntervalEnum);
+                //Query1Structure.build(stream, timeIntervalEnum);
+                Query2Structure.build(stream,timeIntervalEnum);
             } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
                 e.printStackTrace();
             }

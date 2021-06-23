@@ -1,4 +1,4 @@
-package it.uniroma2.ing.dicii.sabd.Utils;
+package it.uniroma2.ing.dicii.sabd.utils;
 
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 

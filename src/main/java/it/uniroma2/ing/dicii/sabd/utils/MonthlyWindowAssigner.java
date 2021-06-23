@@ -1,4 +1,4 @@
-package it.uniroma2.ing.dicii.sabd.Utils;
+package it.uniroma2.ing.dicii.sabd.utils;
 
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.WindowStagger;
@@ -9,9 +9,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 
-public class WeeklyWindowAssigner extends TumblingEventTimeWindows {
+public class MonthlyWindowAssigner extends TumblingEventTimeWindows {
 
-    public WeeklyWindowAssigner(){
+    public MonthlyWindowAssigner(){
         super(1,0, WindowStagger.ALIGNED);
     }
     /*
@@ -28,11 +28,11 @@ public class WeeklyWindowAssigner extends TumblingEventTimeWindows {
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
-        calendar.set(Calendar.DAY_OF_WEEK, 1);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
 
         long startDate = calendar.getTimeInMillis();
 
-        calendar.add(Calendar.WEEK_OF_YEAR,1);
+        calendar.add(Calendar.MONTH,1);
 
         long endDate = calendar.getTimeInMillis()-1;
 

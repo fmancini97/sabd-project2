@@ -1,4 +1,4 @@
-package it.uniroma2.ing.dicii.sabd.Utils;
+package it.uniroma2.ing.dicii.sabd.utils;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -14,6 +14,7 @@ public class KafkaProperties {
 
     public static final String SOURCE_TOPIC = "source";
     public static final String QUERY1_TOPIC = "query1";
+    public static final String QUERY2_TOPIC = "query2";
     public static final String KAFKA_ADDRESS = "localhost:9092";
 
     public static Properties getInjectorProperties(){

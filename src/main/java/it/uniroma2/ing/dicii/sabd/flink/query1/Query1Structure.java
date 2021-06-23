@@ -1,31 +1,29 @@
 package it.uniroma2.ing.dicii.sabd.flink.query1;
 
 import it.uniroma2.ing.dicii.sabd.TripData;
-import it.uniroma2.ing.dicii.sabd.Utils.KafkaProperties;
-import it.uniroma2.ing.dicii.sabd.Utils.MonthlyWindowAssigner;
-import it.uniroma2.ing.dicii.sabd.Utils.TimeIntervalEnum;
+import it.uniroma2.ing.dicii.sabd.utils.KafkaProperties;
+import it.uniroma2.ing.dicii.sabd.utils.TimeIntervalEnum;
 import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
-import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
-import org.apache.flink.util.Collector;
 
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Properties;
 
+import static it.uniroma2.ing.dicii.sabd.utils.GridHandler.channelOfSicilyLon;
+
+
 public class Query1Structure {
 
-    final static double channelOfSicilyLon = 11.797697;
+
     public static void build(DataStream<Tuple2<Long,String>> source, TimeIntervalEnum timeIntervalEnum) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         Constructor<? extends TumblingEventTimeWindows> timeIntervalConstructor = null;
 
@@ -35,7 +33,7 @@ public class Query1Structure {
         DataStream<TripData> stream = source.map((MapFunction<Tuple2<Long, String>, TripData>) tuple -> {
             String[] info = tuple.f1.split(",");
             return new TripData(info[10],info[0],Double.parseDouble(info[3]),
-                    Double.parseDouble(info[4]), tuple.f0, Integer.parseInt(info[1]));
+                    Double.parseDouble(info[4]), tuple.f0, Integer.parseInt(info[1]), tuple.f0);
         }).filter((FilterFunction<TripData>) tripData -> tripData.getLon() < channelOfSicilyLon)
         .name("stream-query1");
 
