@@ -2,8 +2,9 @@ package it.uniroma2.ing.dicii.sabd.flink.query3;
 
 import it.uniroma2.ing.dicii.sabd.TripData;
 import org.apache.flink.api.common.functions.AggregateFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
 
-public class Query3Aggregator implements AggregateFunction<TripData, Query3Accumulator, Double> {
+public class Query3Aggregator implements AggregateFunction<TripData, Query3Accumulator, Tuple2<Long, Double>> {
 
 
     @Override
@@ -18,8 +19,8 @@ public class Query3Aggregator implements AggregateFunction<TripData, Query3Accum
     }
 
     @Override
-    public Double getResult(Query3Accumulator query3Accumulator) {
-        return query3Accumulator.getDistance();
+    public Tuple2<Long, Double> getResult(Query3Accumulator query3Accumulator) {
+        return new Tuple2<>(query3Accumulator.getLastTimestamp(), query3Accumulator.getDistance());
     }
 
     @Override

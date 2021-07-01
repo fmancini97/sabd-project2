@@ -15,6 +15,7 @@ import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
@@ -31,13 +32,14 @@ public class FlinkMain {
     public static void main(String[] args){
 
         //setup flink environment
-        StreamExecutionEnvironment environment = StreamExecutionEnvironment.getExecutionEnvironment();
+        Configuration conf = new Configuration();
+        StreamExecutionEnvironment environment = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(conf);
 
 
         Properties props = KafkaProperties.getFlinkConsumerProperties();
         FlinkKafkaConsumer<String> consumer = new FlinkKafkaConsumer<>(KafkaProperties.SOURCE_TOPIC, new SimpleStringSchema(), props);
 
-        consumer.assignTimestampsAndWatermarks(WatermarkStrategy.forBoundedOutOfOrderness(Duration.ofMinutes(1)));
+        //consumer.assignTimestampsAndWatermarks(WatermarkStrategy.forBoundedOutOfOrderness(Duration.ofMinutes(1)));
 
         DataStream<Tuple2<Long, String>> stream = environment
                 .addSource(consumer)
@@ -78,7 +80,7 @@ public class FlinkMain {
         }*/
 
         try {
-            Query3Structure.build(stream, TimeIntervalEnum.MONTHLY);
+            Query3Structure.build(stream, TimeIntervalEnum.WEEKLY);
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         } catch (InstantiationException e) {

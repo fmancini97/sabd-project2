@@ -30,7 +30,7 @@ public class SessionWindowTrigger extends Trigger<Object, TimeWindow> {
     public TriggerResult onEventTime(long l, TimeWindow timeWindow, TriggerContext triggerContext) throws Exception {
         //System.out.println("Watermark: " + new Date(l) + " [" + new Date(timeWindow.getStart()) + " " + new Date(timeWindow.getEnd()) + "]");
         TriggerResult result = this.eventTimeTrigger.onEventTime(l, timeWindow, triggerContext);
-        return (result == TriggerResult.FIRE) ? TriggerResult.PURGE : TriggerResult.CONTINUE;
+        return (result == TriggerResult.FIRE) ? TriggerResult.FIRE_AND_PURGE : TriggerResult.CONTINUE;
     }
 
     @Override
@@ -45,7 +45,7 @@ public class SessionWindowTrigger extends Trigger<Object, TimeWindow> {
 
     @Override
     public void onMerge(TimeWindow window, OnMergeContext ctx) throws Exception {
-        //this.eventTimeTrigger.onMerge(window, ctx);
+        this.eventTimeTrigger.onMerge(window, ctx);
     }
 
     public static SessionWindowTrigger create() {
