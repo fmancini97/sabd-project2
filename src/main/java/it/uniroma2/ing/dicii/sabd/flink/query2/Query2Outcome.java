@@ -1,5 +1,7 @@
 package it.uniroma2.ing.dicii.sabd.flink.query2;
 
+import org.apache.flink.streaming.api.windowing.triggers.TriggerResult;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -8,7 +10,6 @@ import java.util.List;
 public class Query2Outcome {
 
     private Date date;
-
 
     private List<Query2IntermediateOutcome> amTop3;
     private List<Query2IntermediateOutcome> pmTop3;
@@ -109,7 +110,4 @@ public class Query2Outcome {
         }
 
     }
-
-
-
 }

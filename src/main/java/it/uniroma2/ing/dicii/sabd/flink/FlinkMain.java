@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.util.Properties;
 
 
+import it.uniroma2.ing.dicii.sabd.flink.query3.Query3Structure;
 import it.uniroma2.ing.dicii.sabd.utils.KafkaProperties;
 import it.uniroma2.ing.dicii.sabd.utils.TimeIntervalEnum;
 import it.uniroma2.ing.dicii.sabd.flink.query2.Query2Structure;
@@ -66,14 +67,26 @@ public class FlinkMain {
                 .name("stream-source");
 
 
-
+        /*
         for(TimeIntervalEnum timeIntervalEnum: TimeIntervalEnum.values()){
             try {
                 //Query1Structure.build(stream, timeIntervalEnum);
-                Query2Structure.build(stream,timeIntervalEnum);
+                //Query2Structure.build(stream,timeIntervalEnum);
             } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
                 e.printStackTrace();
             }
+        }*/
+
+        try {
+            Query3Structure.build(stream, TimeIntervalEnum.MONTHLY);
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
         }
 
 
