@@ -24,18 +24,11 @@ import static it.uniroma2.ing.dicii.sabd.utils.GridHandler.channelOfSicilyLon;
 public class Query1Structure {
 
 
-    public static void build(DataStream<Tuple2<Long,String>> source, TimeIntervalEnum timeIntervalEnum) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+    public static void build(DataStream<TripData> stream, TimeIntervalEnum timeIntervalEnum) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
         Constructor<? extends TumblingEventTimeWindows> timeIntervalConstructor = null;
 
         timeIntervalConstructor = timeIntervalEnum.getTimeIntervalClass().getConstructor();
 
-
-        DataStream<TripData> stream = source.map((MapFunction<Tuple2<Long, String>, TripData>) tuple -> {
-            String[] info = tuple.f1.split(",");
-            return new TripData(info[10],info[0],Double.parseDouble(info[3]),
-                    Double.parseDouble(info[4]), tuple.f0, Integer.parseInt(info[1]), tuple.f0);
-        }).filter((FilterFunction<TripData>) tripData -> tripData.getLon() < channelOfSicilyLon)
-        .name("stream-query1");
 
         Properties props = KafkaProperties.getFlinkProducerProperties();
 

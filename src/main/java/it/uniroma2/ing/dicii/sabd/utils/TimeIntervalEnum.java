@@ -7,6 +7,8 @@ import java.util.Date;
 
 public enum TimeIntervalEnum {
 
+    HOURLY("Hourly", HourlyWindowAssigner.class,Calendar.HOUR_OF_DAY),
+    EVERYTWOHOURS("EveryTwoHours", HourlyWindowAssigner.class,Calendar.HOUR_OF_DAY),
     WEEKLY("Weekly", WeeklyWindowAssigner.class,Calendar.DAY_OF_WEEK),
     MONTHLY("Monthly", MonthlyWindowAssigner.class,Calendar.DAY_OF_MONTH);
 

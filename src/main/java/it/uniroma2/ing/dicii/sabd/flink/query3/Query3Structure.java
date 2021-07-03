@@ -22,14 +22,7 @@ import java.util.Properties;
 
 public class Query3Structure {
 
-    public static void build(DataStream<Tuple2<Long, String>> source, TimeIntervalEnum timeIntervalEnum) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
-
-
-        DataStream<TripData> stream = source.map((MapFunction<Tuple2<Long, String>, TripData>) tuple -> {
-            String[] info = tuple.f1.split(",");
-            return new TripData(info[10],info[0],Double.parseDouble(info[3]),
-                    Double.parseDouble(info[4]), tuple.f0, Integer.parseInt(info[1]), tuple.f0);
-        }).name("stream-query3");
+    public static void build(DataStream<TripData> stream, TimeIntervalEnum timeIntervalEnum) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
 
         Properties props = KafkaProperties.getFlinkProducerProperties();
 
@@ -81,10 +74,10 @@ public class Query3Structure {
                 .name("query2HalfDay")
                 .windowAll(TumblingEventTimeWindows.of(Time.hours(1)))
                 .aggregate(new Query3Ranking(), new Query3RankWindow())
-                .addSink(new FlinkKafkaProducer<>(KafkaProperties.QUERY2_TOPIC + timeIntervalEnum.getTimeIntervalName(),
-                        new FlinkOutputSerializer(KafkaProperties.QUERY2_TOPIC + timeIntervalEnum.getTimeIntervalName()),
+                .addSink(new FlinkKafkaProducer<>(KafkaProperties.QUERY3_TOPIC + timeIntervalEnum.getTimeIntervalName(),
+                        new FlinkOutputSerializer(KafkaProperties.QUERY3_TOPIC + timeIntervalEnum.getTimeIntervalName()),
                         props, FlinkKafkaProducer.Semantic.EXACTLY_ONCE))
-                .name("query2" + timeIntervalEnum.getTimeIntervalName() + "Sink").setParallelism(1);
+                .name("query3" + timeIntervalEnum.getTimeIntervalName() + "Sink").setParallelism(1);
     }
 
 }

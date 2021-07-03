@@ -8,7 +8,6 @@ import org.apache.flink.util.Collector;
 
 public class Query3Window extends ProcessWindowFunction<Tuple2<Long, Double> , Tuple3<String, Long, Double>, String, TimeWindow> {
 
-
     @Override
     public void process(String key, Context context, Iterable<Tuple2<Long, Double>> iterable, Collector<Tuple3<String, Long, Double>> collector) throws Exception {
         Tuple2<Long, Double> result = iterable.iterator().next();

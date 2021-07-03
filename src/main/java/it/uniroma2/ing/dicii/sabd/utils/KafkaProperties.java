@@ -15,6 +15,7 @@ public class KafkaProperties {
     public static final String SOURCE_TOPIC = "source";
     public static final String QUERY1_TOPIC = "query1";
     public static final String QUERY2_TOPIC = "query2";
+    public static final String QUERY3_TOPIC = "query3";
     public static final String KAFKA_ADDRESS = "kafka:9092";
 
     public static Properties getInjectorProperties(){

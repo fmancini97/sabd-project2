@@ -1,5 +1,8 @@
 package it.uniroma2.ing.dicii.sabd.flink;
 
+import it.uniroma2.ing.dicii.sabd.TripData;
+import it.uniroma2.ing.dicii.sabd.flink.query1.Query1Structure;
+import it.uniroma2.ing.dicii.sabd.flink.query2.Query2Structure;
 import it.uniroma2.ing.dicii.sabd.flink.query3.Query3Structure;
 import it.uniroma2.ing.dicii.sabd.utils.KafkaProperties;
 import it.uniroma2.ing.dicii.sabd.utils.TimeIntervalEnum;
@@ -37,7 +40,7 @@ public class FlinkMain {
 
         consumer.assignTimestampsAndWatermarks(WatermarkStrategy.forBoundedOutOfOrderness(Duration.ofMinutes(1)));
 
-        DataStream<Tuple2<Long, String>> stream = environment
+        DataStream<Tuple2<Long, String>> sourceStream = environment
                 .addSource(consumer)
                 .map(new MapFunction<String, Tuple2<Long, String>>() {
                     @Override
@@ -63,27 +66,28 @@ public class FlinkMain {
                     })
                 .name("stream-source");
 
+        DataStream<TripData> stream = sourceStream.map((MapFunction<Tuple2<Long, String>, TripData>) tuple -> {
+            String[] info = tuple.f1.split(",");
+            return new TripData(info[10],info[0],Double.parseDouble(info[3]),
+                    Double.parseDouble(info[4]), tuple.f0, Integer.parseInt(info[1]), tuple.f0);
+        }).name("stream-data");
 
-        /*
         for(TimeIntervalEnum timeIntervalEnum: TimeIntervalEnum.values()){
             try {
-                //Query1Structure.build(stream, timeIntervalEnum);
-                //Query2Structure.build(stream,timeIntervalEnum);
+                switch (timeIntervalEnum){
+                    case HOURLY:
+                    case EVERYTWOHOURS:
+                        Query3Structure.build(stream,timeIntervalEnum);
+                        break;
+                    case WEEKLY:
+                    case MONTHLY:
+                        Query1Structure.build(stream, timeIntervalEnum);
+                        Query2Structure.build(stream,timeIntervalEnum);
+                        break;
+                }
             } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
                 e.printStackTrace();
             }
-        }*/
-
-        try {
-            Query3Structure.build(stream, TimeIntervalEnum.WEEKLY);
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
         }
 
 

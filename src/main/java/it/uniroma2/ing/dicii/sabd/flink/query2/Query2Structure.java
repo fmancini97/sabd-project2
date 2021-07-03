@@ -9,9 +9,13 @@ import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
+import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
+import org.apache.flink.streaming.api.windowing.assigners.SlidingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
+import org.apache.flink.util.Collector;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -21,18 +25,12 @@ import java.util.*;
 public class Query2Structure {
 
 
-    public static void build(DataStream<Tuple2<Long, String>> source, TimeIntervalEnum timeIntervalEnum) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+    public static void build(DataStream<TripData> stream, TimeIntervalEnum timeIntervalEnum) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
 
         Constructor<? extends TumblingEventTimeWindows> timeIntervalConstructor = null;
 
         timeIntervalConstructor = timeIntervalEnum.getTimeIntervalClass().getConstructor();
 
-
-        DataStream<TripData> stream = source.map((MapFunction<Tuple2<Long, String>, TripData>) tuple -> {
-            String[] info = tuple.f1.split(",");
-            return new TripData(info[10],info[0],Double.parseDouble(info[3]),
-                    Double.parseDouble(info[4]), tuple.f0, Integer.parseInt(info[1]), tuple.f0);
-        }).name("stream-query2");
 
         Properties props = KafkaProperties.getFlinkProducerProperties();
 
@@ -93,4 +91,5 @@ public class Query2Structure {
 
         return builder.toString();
     }
+
 }
