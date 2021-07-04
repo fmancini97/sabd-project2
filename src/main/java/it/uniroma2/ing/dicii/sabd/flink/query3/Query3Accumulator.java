@@ -23,9 +23,8 @@ public class Query3Accumulator {
             this.lastPos = pos;
         }
 
-        this.distance = this.distance + this.computeDistance(this.lastPos, pos);
+        this.distance = this.computeDistance(this.lastPos, pos);
 
-        this.lastPos = pos;
         this.lastTimestamp = data.getTimestamp();
     }
 

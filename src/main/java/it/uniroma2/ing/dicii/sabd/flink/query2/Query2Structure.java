@@ -72,22 +72,33 @@ public class Query2Structure {
 
     private static String query2OutcomeToResultMap(TimeIntervalEnum timeIntervalEnum, Query2Outcome query2Outcome) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        System.out.println("Kalimera");
         StringBuilder builder = new StringBuilder();
         Date date = query2Outcome.getDate();
         builder.append(simpleDateFormat.format(date))
                 .append(",").append(query2Outcome.getSeaType());
 
-        builder.append(",00:00-11:59");
-        query2Outcome.getAmTop3().forEach(v -> {
-            builder.append(",").append(v.getCellId());
-        });
+        builder.append(",00:00-11:59,[");
 
-        builder.append(",12:00-23:59");
-        query2Outcome.getPmTop3().forEach(v -> {
-            builder.append(",").append(v.getCellId());
-        });
+        List<Query2IntermediateOutcome> temporaryList = query2Outcome.getAmTop3();
+        int iterations = temporaryList.size();
+        for(int i = 0; i<iterations; i++){
+            if(i+1==iterations)
+                builder.append(temporaryList.get(i).getCellId());
+            else
+                builder.append(temporaryList.get(i).getCellId()).append(";");
+        }
 
+
+        builder.append("],12:00-23:59,[");
+        temporaryList = query2Outcome.getPmTop3();
+        iterations = temporaryList.size();
+        for(int i = 0; i<iterations; i++){
+            if(i+1==iterations)
+                builder.append(temporaryList.get(i).getCellId());
+            else
+                builder.append(temporaryList.get(i).getCellId()).append(";");
+        }
+        builder.append("]");
 
         return builder.toString();
     }

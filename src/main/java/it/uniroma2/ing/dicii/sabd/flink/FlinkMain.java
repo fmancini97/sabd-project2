@@ -40,11 +40,11 @@ public class FlinkMain {
 
         consumer.assignTimestampsAndWatermarks(WatermarkStrategy.forBoundedOutOfOrderness(Duration.ofMinutes(1)));
 
-        DataStream<Tuple2<Long, String>> sourceStream = environment
+        DataStream<TripData> stream = environment
                 .addSource(consumer)
-                .map(new MapFunction<String, Tuple2<Long, String>>() {
+                .map(new MapFunction<String, TripData>() {
                     @Override
-                    public Tuple2<Long, String> map(String s) throws Exception {
+                    public TripData map(String s) throws Exception {
                             String[] values = s.split(",");
                             String dateString = values[7];
                             Long timestamp = null;
@@ -58,19 +58,16 @@ public class FlinkMain {
 
                             if (timestamp == null) {
                                 System.out.println("Timestamp null!");
-                                //ignore tuple
+                                //todo ignore tuple
                             }
 
-                            return new Tuple2<>(timestamp, s);
+                            return new TripData(values[10],values[0],Double.parseDouble(values[3]),
+                                    Double.parseDouble(values[4]), timestamp, Integer.parseInt(values[1]), timestamp);
+
                         }
                     })
-                .name("stream-source");
+                .name("stream-data");
 
-        DataStream<TripData> stream = sourceStream.map((MapFunction<Tuple2<Long, String>, TripData>) tuple -> {
-            String[] info = tuple.f1.split(",");
-            return new TripData(info[10],info[0],Double.parseDouble(info[3]),
-                    Double.parseDouble(info[4]), tuple.f0, Integer.parseInt(info[1]), tuple.f0);
-        }).name("stream-data");
 
         for(TimeIntervalEnum timeIntervalEnum: TimeIntervalEnum.values()){
             try {

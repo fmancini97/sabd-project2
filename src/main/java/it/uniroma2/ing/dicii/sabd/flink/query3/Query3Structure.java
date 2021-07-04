@@ -40,7 +40,7 @@ public class Query3Structure {
                         } else {
                             endDateString = tripID.substring(tripID.indexOf(" - ") + 3);
                         }
-
+                        //todo cancellare le stampe che non servono effettivamente
                         if (!tripID.contains(" - ")) {
                             System.out.println("Errore");
                         }

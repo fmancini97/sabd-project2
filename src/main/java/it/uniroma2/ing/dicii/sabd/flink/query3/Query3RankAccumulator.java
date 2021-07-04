@@ -58,7 +58,12 @@ public class Query3RankAccumulator {
     public String getResult() {
         StringBuilder result = new StringBuilder();
         NavigableSet<Tuple2<String, Double>> rankResult = this.ranking.descendingSet();
-        rankResult.forEach((element) -> result.append(",").append(element.f0).append(",").append(element.f1));
+        rankResult.forEach((element) -> {
+            if(element.f1 < 0)
+                result.append(",").append(element.f0).append(",").append("");
+            else
+                result.append(",").append(element.f0).append(",").append(String.format(Locale.ENGLISH, "%.4g",element.f1));
+        });
         return result.toString();
     }
 }
