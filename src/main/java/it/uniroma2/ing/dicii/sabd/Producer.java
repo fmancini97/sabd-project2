@@ -3,7 +3,6 @@ package it.uniroma2.ing.dicii.sabd;
 import it.uniroma2.ing.dicii.sabd.utils.JSONTools;
 import it.uniroma2.ing.dicii.sabd.utils.KafkaProperties;
 import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -19,7 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-public class Injector {
+public class Producer {
     private static final SimpleDateFormat[] dateFormats = {new SimpleDateFormat("dd/MM/yy HH:mm"),
             new SimpleDateFormat("dd-MM-yy HH:mm")};
     private static final String defaultFlinkURL = "localhost:8081";
@@ -30,13 +29,13 @@ public class Injector {
 
     public static void main( String[] args ) {
 
-        Logger log = Logger.getLogger(Injector.class.getSimpleName());
+        Logger log = Logger.getLogger(Producer.class.getSimpleName());
         //log.setLevel(Level.INFO);
 
         log.info("Parsing parameter");
 
         if (args.length < 2) {
-            log.log(Level.WARNING, "Usage: {0} <minutes> <waitFlinkJob[true/FALSE]> [<flinkURL>]", Injector.class.getName());
+            log.log(Level.WARNING, "Usage: {0} <minutes> <waitFlinkJob[true/FALSE]> [<flinkURL>]", Producer.class.getName());
             System.exit(-1);
         }
 
@@ -68,7 +67,7 @@ public class Injector {
 
 
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(Injector.datasetPath));
+            BufferedReader reader = new BufferedReader(new FileReader(Producer.datasetPath));
             String line;
             reader.readLine(); //read header
             while ((line = reader.readLine()) != null) {
@@ -113,7 +112,7 @@ public class Injector {
         }
 
         Properties props = KafkaProperties.getInjectorProperties();
-        Producer<Long, String> producer = new KafkaProducer<>(props);
+        org.apache.kafka.clients.producer.Producer producer = new KafkaProducer<>(props);
 
         Set<Map.Entry<Long, List<String>>> timeSet = map.entrySet();
 

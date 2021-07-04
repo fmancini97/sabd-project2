@@ -70,6 +70,7 @@ public class KafkaProperties {
         // start reading from beginning of partition if no offset was created
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         // exactly once semantic
+        props.put(ConsumerConfig.METADATA_MAX_AGE_CONFIG, 5000);
 
         // key and value deserializers
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, LongDeserializer.class.getName());

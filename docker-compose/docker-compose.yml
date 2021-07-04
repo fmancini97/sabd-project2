@@ -27,6 +27,15 @@ services:
       - kafka
       - jobmanager
 
+  consumer:
+    image: fmancini/consumer
+    build:
+      context: ./consumer
+    volumes:
+      - "./consumer/output:/output"
+    depends_on:
+      - kafka
+
   jobmanager:
     image: flink:latest
     container_name: jobmanager
@@ -39,6 +48,7 @@ services:
       - |
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
+        metrics.latency.interval: 5000
 
   taskmanager:
     image: flink:latest
@@ -49,4 +59,5 @@ services:
       - |
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
-        taskmanager.numberOfTaskSlots: 2
+        taskmanager.numberOfTaskSlots: 4
+        metrics.latency.interval: 5000
