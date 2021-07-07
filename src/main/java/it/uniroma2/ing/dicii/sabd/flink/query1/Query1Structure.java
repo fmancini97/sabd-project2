@@ -2,6 +2,7 @@ package it.uniroma2.ing.dicii.sabd.flink.query1;
 
 import it.uniroma2.ing.dicii.sabd.TripData;
 import it.uniroma2.ing.dicii.sabd.utils.KafkaProperties;
+import it.uniroma2.ing.dicii.sabd.utils.ShipTypeEnum;
 import it.uniroma2.ing.dicii.sabd.utils.TimeIntervalEnum;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
@@ -57,11 +58,22 @@ public class Query1Structure {
 
         int daysOfActualTimeInterval = timeIntervalEnum.getNumDays(date);
         System.out.println(daysOfActualTimeInterval);
+
+        /*
         //todo stampare tutte le tipologie di navi, anche quelle con v=0
         query1Outcome.getTypeMap().forEach((k,v) -> {
             builder.append(",").append(k).append(",").append(String.format(Locale.ENGLISH, "%.2g",(double)v/daysOfActualTimeInterval));
         });
+        */
 
+        for(ShipTypeEnum shipType: ShipTypeEnum.values()){
+            Integer v = query1Outcome.getTypeMap().get(shipType.getShipType());
+            if(v == null){
+                builder.append(",").append(shipType.getShipType()).append(",").append("");
+            } else {
+                builder.append(",").append(shipType.getShipType()).append(",").append(String.format(Locale.ENGLISH, "%.2g",(double)v/daysOfActualTimeInterval));
+            }
+        }
 
         return builder.toString();
     }
