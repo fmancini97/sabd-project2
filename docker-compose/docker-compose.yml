@@ -49,6 +49,14 @@ services:
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
         metrics.latency.interval: 5000
+        metrics.latency.granularity: operator
+        metrics.reporter.grph.factory.class: org.apache.flink.metrics.graphite.GraphiteReporterFactory
+        metrics.reporter.grph.host: graphite
+        metrics.reporter.grph.port: 2003
+        metrics.reporter.grph.protocol: TCP
+        metrics.reporter.grph.interval: 60 SECONDS
+    depends_on:
+      - graphite
 
   taskmanager:
     image: flink:latest
@@ -61,3 +69,19 @@ services:
         jobmanager.rpc.address: jobmanager
         taskmanager.numberOfTaskSlots: 4
         metrics.latency.interval: 5000
+        metrics.latency.granularity: operator
+        metrics.reporter.grph.factory.class: org.apache.flink.metrics.graphite.GraphiteReporterFactory
+        metrics.reporter.grph.host: graphite
+        metrics.reporter.grph.port: 2003
+        metrics.reporter.grph.protocol: TCP
+        metrics.reporter.grph.interval: 60 SECONDS
+
+  graphite:
+    image: graphiteapp/graphite-statsd
+    container_name: graphite
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - 3000:3000

@@ -12,7 +12,7 @@ public class SerDesBuilder {
         Map<String, Object> serdeProps = new HashMap<>();
 
         // create serializer and deserializer
-        Serializer<T> serializer = new JsonPOJOSerializer<>();
+        Serializer<T> serializer = new JsonPOJOSerializer<>();;
         Deserializer<T> deserializer = new JsonPOJODeserializer<>();
         // specify the class as input of serialization and output of deserialization
         serdeProps.put("JsonPOJOClass", classT);

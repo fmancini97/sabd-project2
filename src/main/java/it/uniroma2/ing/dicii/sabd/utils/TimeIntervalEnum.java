@@ -17,8 +17,8 @@ public enum TimeIntervalEnum {
 
     private final int dayOfActualTimeInterval;
 
-    private TimeIntervalEnum(final String timeIntervalName, final Class<? extends TumblingEventTimeWindows> timeIntervalClass,
-    int dayOfActualTimeInterval){
+    TimeIntervalEnum(final String timeIntervalName, final Class<? extends TumblingEventTimeWindows> timeIntervalClass,
+                     int dayOfActualTimeInterval){
         this.timeIntervalName = timeIntervalName;
         this.timeIntervalClass = timeIntervalClass;
         this.dayOfActualTimeInterval = dayOfActualTimeInterval;

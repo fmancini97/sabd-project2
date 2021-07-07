@@ -9,8 +9,6 @@ import it.uniroma2.ing.dicii.sabd.utils.TimeIntervalEnum;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
@@ -19,7 +17,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class FlinkMain {
@@ -30,6 +31,7 @@ public class FlinkMain {
 
 
     public static void main(String[] args) {
+        Logger log = Logger.getLogger(FlinkMain.class.getSimpleName());
 
         //setup flink environment
         StreamExecutionEnvironment environment = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -56,11 +58,6 @@ public class FlinkMain {
                                 }
                             }
 
-                            if (timestamp == null) {
-                                System.out.println("Timestamp null!");
-                                //todo ignore tuple
-                            }
-
                             return new TripData(values[10],values[0],Double.parseDouble(values[3]),
                                     Double.parseDouble(values[4]), timestamp, Integer.parseInt(values[1]), timestamp);
 
@@ -69,22 +66,19 @@ public class FlinkMain {
                 .name("stream-data");
 
 
-        for(TimeIntervalEnum timeIntervalEnum: TimeIntervalEnum.values()){
-            try {
-                switch (timeIntervalEnum){
-                    case HOURLY:
-                    case EVERYTWOHOURS:
-                        Query3Structure.build(stream,timeIntervalEnum);
-                        break;
-                    case WEEKLY:
-                    case MONTHLY:
-                        Query1Structure.build(stream, timeIntervalEnum);
-                        Query2Structure.build(stream,timeIntervalEnum);
-                        break;
-                }
-            } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
-                e.printStackTrace();
+
+        try {
+            for (TimeIntervalEnum timeIntervalEnum: Arrays.asList(TimeIntervalEnum.WEEKLY, TimeIntervalEnum.MONTHLY)) {
+                Query1Structure.build(stream, timeIntervalEnum);
+                Query2Structure.build(stream,timeIntervalEnum);
             }
+
+            for (TimeIntervalEnum timeIntervalEnum: Arrays.asList(TimeIntervalEnum.HOURLY, TimeIntervalEnum.EVERYTWOHOURS)) {
+                Query3Structure.build(stream, timeIntervalEnum);
+            }
+
+        } catch (InvocationTargetException | InstantiationException |  IllegalAccessException | NoSuchMethodException e) {
+            log.log(Level.SEVERE, "Error while creating execution environment: {0}", e.getMessage());
         }
 
 
@@ -92,8 +86,8 @@ public class FlinkMain {
             environment.execute("SABD Project 2");
         } catch (Exception e) {
             e.printStackTrace();
+            log.log(Level.SEVERE, "Error while executing environment: {0}", e.getMessage());
         }
-
 
     }
 }

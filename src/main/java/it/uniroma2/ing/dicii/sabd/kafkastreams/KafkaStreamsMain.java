@@ -1,5 +1,6 @@
 package it.uniroma2.ing.dicii.sabd.kafkastreams;
 
+import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Properties;
@@ -7,6 +8,7 @@ import java.util.Properties;
 import it.uniroma2.ing.dicii.sabd.TripData;
 import it.uniroma2.ing.dicii.sabd.kafkastreams.query1.Query1Structure;
 import it.uniroma2.ing.dicii.sabd.utils.KafkaProperties;
+import it.uniroma2.ing.dicii.sabd.utils.KafkaStreamTimeIntervalEnum;
 import it.uniroma2.ing.dicii.sabd.utils.KafkaStreamsProperties;
 import it.uniroma2.ing.dicii.sabd.utils.TimeIntervalEnum;
 import org.apache.kafka.streams.KafkaStreams;
@@ -55,15 +57,12 @@ public class KafkaStreamsMain {
         });
 
         // build query 1 topology
-        for(TimeIntervalEnum timeIntervalEnum: TimeIntervalEnum.values()){
-            switch (timeIntervalEnum){
-                case HOURLY:
-                case EVERYTWOHOURS:
-                    break;
-                case WEEKLY:
-                case MONTHLY:
-                     Query1Structure.build(dataStream,timeIntervalEnum);
-                    break;
+        for(KafkaStreamTimeIntervalEnum timeIntervalEnum: KafkaStreamTimeIntervalEnum.values()){
+
+            try {
+                Query1Structure.build(dataStream,timeIntervalEnum);
+            } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
             }
         }
 
