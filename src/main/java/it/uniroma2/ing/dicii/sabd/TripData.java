@@ -2,6 +2,8 @@ package it.uniroma2.ing.dicii.sabd;
 
 import it.uniroma2.ing.dicii.sabd.utils.GridHandler;
 
+import static it.uniroma2.ing.dicii.sabd.utils.GridHandler.computeValidity;
+
 public class TripData {
 
 
@@ -13,6 +15,7 @@ public class TripData {
     String cell;
     String shipType;
     long dateAsTimestamp;
+    boolean isValid;
 
     public long getDateAsTimestamp() {
         return dateAsTimestamp;
@@ -31,6 +34,11 @@ public class TripData {
         this.shipType = setShipType(shipType);
         this.cell = computeCell(lat, lon);
         this.dateAsTimestamp = dateAsTimestamp;
+        this.isValid = computeValidity(lat,lon);
+    }
+
+    public boolean isValid(){
+        return isValid;
     }
 
     private String setShipType(int shipType){

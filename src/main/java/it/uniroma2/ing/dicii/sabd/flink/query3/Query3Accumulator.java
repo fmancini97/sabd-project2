@@ -6,7 +6,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 public class Query3Accumulator {
 
     private Double distance;
-    private Tuple2<Double, Double> lastPos;
+    private Tuple2<Double, Double> lastPos; //lat lon
     private static final double RADIUS = 6378.388;
     private long lastTimestamp;
 
@@ -28,8 +28,19 @@ public class Query3Accumulator {
         this.lastTimestamp = data.getTimestamp();
     }
 
+    //Compute distance between P and Q
     private Double computeDistance(Tuple2<Double, Double> start, Tuple2<Double, Double> end) {
-        return Math.sqrt(Math.pow(RADIUS *Math.PI/180*(end.f0-start.f0),2)+Math.pow(RADIUS *Math.PI/180*(end.f1-start.f1),2));
+        double thetaP = toRadians(start.f0);
+        double phiP = toRadians(start.f1);
+        double thetaQ = toRadians(end.f0);
+        double phiQ = toRadians(end.f1);
+        double dLat = phiQ-phiP;
+
+        return RADIUS*Math.acos(Math.cos(dLat)*Math.cos(thetaP)*Math.cos(thetaQ)+Math.sin(thetaP)*Math.sin(thetaQ));
+    }
+
+    private double toRadians(double value){
+        return value*Math.PI/180;
     }
 
     public Double getDistance() {

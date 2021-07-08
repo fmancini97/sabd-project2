@@ -44,6 +44,10 @@ public class GridHandler {
         return "" + latId + lonId;
     }
 
+    public static boolean computeValidity(double lat, double lon){
+        return lat>=minLat && lat <=maxLat && lon>=minLon && lon<=maxLon;
+    }
+
     static{
         lonIndexSeaSeparatorInit();
     }

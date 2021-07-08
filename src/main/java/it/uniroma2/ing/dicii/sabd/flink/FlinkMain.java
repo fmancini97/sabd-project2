@@ -7,11 +7,13 @@ import it.uniroma2.ing.dicii.sabd.flink.query3.Query3Structure;
 import it.uniroma2.ing.dicii.sabd.utils.KafkaProperties;
 import it.uniroma2.ing.dicii.sabd.utils.TimeIntervalEnum;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
+import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
+import org.apache.flink.util.Collector;
 
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
@@ -44,9 +46,10 @@ public class FlinkMain {
 
         DataStream<TripData> stream = environment
                 .addSource(consumer)
-                .map(new MapFunction<String, TripData>() {
+                .flatMap(new FlatMapFunction<String, TripData>() {
                     @Override
-                    public TripData map(String s) throws Exception {
+                    public void flatMap(String s, Collector<TripData> collector) throws Exception {
+
                             String[] values = s.split(",");
                             String dateString = values[7];
                             Long timestamp = null;
@@ -58,12 +61,17 @@ public class FlinkMain {
                                 }
                             }
 
-                            return new TripData(values[10],values[0],Double.parseDouble(values[3]),
+                            if(timestamp == null)
+                                return;
+
+                            TripData data = new TripData(values[10],values[0],Double.parseDouble(values[3]),
                                     Double.parseDouble(values[4]), timestamp, Integer.parseInt(values[1]), timestamp);
+                            if(data.isValid())
+                                collector.collect(data);
+
 
                         }
-                    })
-                .name("stream-data");
+                }).name("stream-data");
 
 
 

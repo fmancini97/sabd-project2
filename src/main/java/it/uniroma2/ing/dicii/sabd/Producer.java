@@ -114,10 +114,11 @@ public class Producer {
                     attempts+=1;
                 }
             } catch (IOException e) {
-                log.log(Level.WARNING, "Error while checking flink status: {}", e.getMessage());
+                log.log(Level.WARNING, "Error while checking flink status: {0}", e.getMessage());
+                e.printStackTrace();
                 System.exit(-1);
             } catch (InterruptedException e) {
-                log.log(Level.WARNING, "Error while Injector sleeping: {}", e.getMessage());
+                log.log(Level.WARNING, "Error while Injector sleeping: {0}", e.getMessage());
             }
         }
 
@@ -163,6 +164,7 @@ public class Producer {
 
     private static boolean checkJobAvailability(String flinkURL) throws IOException {
         String jobsAPIURL = String.format("http://%s/%s", flinkURL, jobsAPI);
+        System.out.println(jobsAPIURL);
         JSONObject jobsState = JSONTools.readJsonFromUrl(jobsAPIURL);
 
         JSONArray jobs = jobsState.getJSONArray("jobs");
