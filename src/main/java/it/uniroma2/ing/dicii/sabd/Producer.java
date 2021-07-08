@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -25,6 +26,7 @@ public class Producer {
     private static final String datasetPath = "/data/dataset.csv";
     private static final String jobsAPI = "v1/jobs";
     private static final String jobName = "SABD Project 2";
+    private static final int MAX_ATTEMPTS = 5;
 
 
     public static void main( String[] args ) {
@@ -96,13 +98,21 @@ public class Producer {
         } catch (IOException e) {
             log.log(Level.SEVERE, "Error while reading file: {0}", e.getMessage());
         }
-
+        int attempts = 0;
         boolean jobReady = false;
         while (waitFlinkJob && !jobReady) {
             try {
                 log.info("Flink Job is not ready");
                 TimeUnit.SECONDS.sleep(5);
                 jobReady = checkJobAvailability(flinkURL);
+            } catch (ConnectException e) {
+                if (attempts == MAX_ATTEMPTS) {
+                    log.log(Level.WARNING, "Error while checking flink status: {}", e.getMessage());
+                    System.exit(-1);
+                } else {
+                    log.log(Level.WARNING, "Flink is not yet available");
+                    attempts+=1;
+                }
             } catch (IOException e) {
                 log.log(Level.WARNING, "Error while checking flink status: {}", e.getMessage());
                 System.exit(-1);
@@ -112,7 +122,7 @@ public class Producer {
         }
 
         Properties props = KafkaProperties.getInjectorProperties();
-        org.apache.kafka.clients.producer.Producer producer = new KafkaProducer<>(props);
+        org.apache.kafka.clients.producer.Producer<Long, String> producer = new KafkaProducer<>(props);
 
         Set<Map.Entry<Long, List<String>>> timeSet = map.entrySet();
 
@@ -134,8 +144,9 @@ public class Producer {
 
             for (String record : entry.getValue()) {
 
-                ProducerRecord<Long, String> producerRecord = new ProducerRecord<>(KafkaProperties.SOURCE_TOPIC, 0, timestamp, timestamp, record);
+                ProducerRecord<Long, String> producerRecord = new ProducerRecord<>(KafkaProperties.SOURCE_TOPIC, null, timestamp, timestamp, record);
 
+                System.out.println(record);
                 log.log(Level.FINER, "Record: {0}", record);
                 producer.send(producerRecord, (recordMetadata, e) -> {e.printStackTrace();});
             }
