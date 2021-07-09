@@ -34,7 +34,7 @@ public class Query2Structure {
         SingleOutputStreamOperator<String> resultStream = stream.keyBy(TripData::getCell)
                 .window(TumblingEventTimeWindows.of(Time.hours(12)))
                 .aggregate(new Query2IntermediateAggregator(), new Query2IntermediateWindow())
-                .name("query2HalfDay")
+                .name("query2" + timeIntervalEnum.getTimeIntervalName() + "-dailyAttendance")
                 .keyBy(new KeySelector<Query2IntermediateOutcome, Tuple2<String, Integer>>() {
                     @Override
                     public Tuple2<String, Integer> getKey(Query2IntermediateOutcome intermediateOutcome) throws Exception {
@@ -48,7 +48,7 @@ public class Query2Structure {
                         t1.setAttendance(t1.getAttendance()+t2.getAttendance());
                         return t1;
                     }
-                })
+                }).name("query2" + timeIntervalEnum.getTimeIntervalName() + "-aggregatedAttendance")
                 .keyBy(new KeySelector<Query2IntermediateOutcome, String>() {
                     @Override
                     public String getKey(Query2IntermediateOutcome query2IntermediateOutcome) throws Exception {
@@ -57,13 +57,15 @@ public class Query2Structure {
                 })
                 .window(timeIntervalConstructor.newInstance())
                 .aggregate(new Query2FinalAggregator(), new Query2Window())
+                .name("query2" + timeIntervalEnum.getTimeIntervalName() + "-ranking")
                 .map((MapFunction<Query2Outcome, String>) query2Outcome -> {
                     return query2OutcomeToResultMap(timeIntervalEnum,query2Outcome);
-                });
+                }).name("query2" + timeIntervalEnum.getTimeIntervalName() + "-outputFormatMapper");
+
         resultStream.addSink(new FlinkKafkaProducer<>(KafkaProperties.QUERY2_TOPIC + timeIntervalEnum.getTimeIntervalName(),
                         new FlinkOutputSerializer(KafkaProperties.QUERY2_TOPIC + timeIntervalEnum.getTimeIntervalName()),
                         props, FlinkKafkaProducer.Semantic.EXACTLY_ONCE))
-                .name("query2" + timeIntervalEnum.getTimeIntervalName() + "Sink");
+                .name("query2" + timeIntervalEnum.getTimeIntervalName() + "-sink");
     }
 
     private static String query2OutcomeToResultMap(TimeIntervalEnum timeIntervalEnum, Query2Outcome query2Outcome) {
@@ -76,6 +78,7 @@ public class Query2Structure {
         builder.append(",00:00-11:59,[");
 
         List<Query2IntermediateOutcome> temporaryList = query2Outcome.getAmTop3();
+        Collections.reverse(temporaryList);
         int iterations = temporaryList.size();
         for(int i = 0; i<iterations; i++){
             if(i+1==iterations)
@@ -87,6 +90,7 @@ public class Query2Structure {
 
         builder.append("],12:00-23:59,[");
         temporaryList = query2Outcome.getPmTop3();
+        Collections.reverse(temporaryList);
         iterations = temporaryList.size();
         for(int i = 0; i<iterations; i++){
             if(i+1==iterations)

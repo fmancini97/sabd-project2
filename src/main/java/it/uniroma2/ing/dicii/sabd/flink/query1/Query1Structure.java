@@ -31,15 +31,15 @@ public class Query1Structure {
         SingleOutputStreamOperator<String> resultStream = stream.keyBy(TripData::getCell)
                 .window(timeIntervalConstructor.newInstance())
                 .aggregate(new Query1Aggregator(), new Query1Window())
-                .name("query1" + timeIntervalEnum.getTimeIntervalName())
+                .name("query1" + timeIntervalEnum.getTimeIntervalName() + "-computeCellData")
                 .map((MapFunction<Query1Outcome, String>) query1Outcome -> {
                     return query1OutcomeToResultMap(timeIntervalEnum,query1Outcome);
-                });
+                }).name("query1" + timeIntervalEnum.getTimeIntervalName() + "-outputFormatMapper");
 
         resultStream.addSink(new FlinkKafkaProducer<>(KafkaProperties.QUERY1_TOPIC + timeIntervalEnum.getTimeIntervalName(),
                         new FlinkOutputSerializer(KafkaProperties.QUERY1_TOPIC + timeIntervalEnum.getTimeIntervalName()),
                         props, FlinkKafkaProducer.Semantic.EXACTLY_ONCE))
-                .name("query1" + timeIntervalEnum.getTimeIntervalName() + "Sink");
+                .name("query1" + timeIntervalEnum.getTimeIntervalName() + "-sink");
     }
 
     private static String query1OutcomeToResultMap(TimeIntervalEnum timeIntervalEnum, Query1Outcome query1Outcome) {

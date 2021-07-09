@@ -1,7 +1,5 @@
 package it.uniroma2.ing.dicii.sabd.flink.query2;
 
-import org.apache.flink.streaming.api.windowing.triggers.TriggerResult;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;

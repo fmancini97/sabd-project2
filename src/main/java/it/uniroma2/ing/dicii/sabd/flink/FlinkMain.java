@@ -45,6 +45,7 @@ public class FlinkMain {
 
         DataStream<TripData> stream = environment
                 .addSource(consumer)
+                .name("source")
                 .flatMap(new FlatMapFunction<String, TripData>() {
                     @Override
                     public void flatMap(String s, Collector<TripData> collector) throws Exception {
@@ -69,9 +70,7 @@ public class FlinkMain {
                                 collector.collect(data);
 
                         }
-                }).name("stream-data");
-
-
+                }).name("parseData");
 
         try {
             for (TimeIntervalEnum timeIntervalEnum: Arrays.asList(TimeIntervalEnum.WEEKLY, TimeIntervalEnum.MONTHLY)) {

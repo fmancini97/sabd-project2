@@ -52,20 +52,19 @@ public class Query3Structure {
 
                         return Math.max(endTimestamp - actualTime + tenMinutes, tenMinutes);
                     }
-
-
-
                 }))
                 .trigger(SessionWindowTrigger.create())
-                .aggregate(new Query3Aggregator(), new Query3Window()).assignTimestampsAndWatermarks(WatermarkStrategy.<Tuple3<String, Long, Double>>forMonotonousTimestamps().withTimestampAssigner((event, timestamp) -> event.f1).withIdleness(Duration.ofMillis(35)))
-                .name("query2HalfDay")
+                .aggregate(new Query3Aggregator(), new Query3Window())
+                .name("query3" + timeIntervalEnum.getTimeIntervalName() + "-computeDistance")
+                .assignTimestampsAndWatermarks(WatermarkStrategy.<Tuple3<String, Long, Double>>forMonotonousTimestamps().withTimestampAssigner((event, timestamp) -> event.f1).withIdleness(Duration.ofMillis(35)))
                 .windowAll(TumblingEventTimeWindows.of(Time.hours(1)))
-                .aggregate(new Query3Ranking(), new Query3RankWindow());
+                .aggregate(new Query3Ranking(), new Query3RankWindow())
+                .name("query3" + timeIntervalEnum.getTimeIntervalName() + "-rank");
 
         resultStream.addSink(new FlinkKafkaProducer<>(KafkaProperties.QUERY3_TOPIC + timeIntervalEnum.getTimeIntervalName(),
                 new FlinkOutputSerializer(KafkaProperties.QUERY3_TOPIC + timeIntervalEnum.getTimeIntervalName()),
                 props, FlinkKafkaProducer.Semantic.EXACTLY_ONCE))
-                .name("query3" + timeIntervalEnum.getTimeIntervalName() + "Sink").setParallelism(1);
+                .name("query3" + timeIntervalEnum.getTimeIntervalName() + "-sink").setParallelism(1);
 
     }
 
