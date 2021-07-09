@@ -5,7 +5,6 @@ import org.apache.flink.streaming.api.windowing.triggers.Trigger;
 import org.apache.flink.streaming.api.windowing.triggers.TriggerResult;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 
-import java.util.Date;
 
 public class SessionWindowTrigger extends Trigger<Object, TimeWindow> {
 
@@ -28,7 +27,6 @@ public class SessionWindowTrigger extends Trigger<Object, TimeWindow> {
 
     @Override
     public TriggerResult onEventTime(long l, TimeWindow timeWindow, TriggerContext triggerContext) throws Exception {
-        //System.out.println("Watermark: " + new Date(l) + " [" + new Date(timeWindow.getStart()) + " " + new Date(timeWindow.getEnd()) + "]");
         TriggerResult result = this.eventTimeTrigger.onEventTime(l, timeWindow, triggerContext);
         return (result == TriggerResult.FIRE) ? TriggerResult.FIRE_AND_PURGE : TriggerResult.CONTINUE;
     }

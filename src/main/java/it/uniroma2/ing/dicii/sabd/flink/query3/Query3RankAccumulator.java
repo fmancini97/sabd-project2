@@ -33,24 +33,15 @@ public class Query3RankAccumulator {
             this.ranking.add(data);
             this.elements.put(data.f0, data);
 
-
-
         } else {
             Tuple2<String, Double> min = this.ranking.first();
 
-            //System.out.println(min);
-            //System.out.println(data);
             if (data.f1 > min.f1) {
                 this.ranking.add(data);
                 this.ranking.remove(min);
                 this.elements.remove(min.f0);
                 this.elements.put(data.f0, data);
             }
-
-            if (this.ranking.size() !=5) {
-                System.out.println("Errorerrrrrrrrrrrr");
-            }
-
 
         }
     }

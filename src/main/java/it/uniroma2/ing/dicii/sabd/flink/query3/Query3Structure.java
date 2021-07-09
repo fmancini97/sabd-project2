@@ -1,11 +1,9 @@
 package it.uniroma2.ing.dicii.sabd.flink.query3;
 
-import it.uniroma2.ing.dicii.sabd.TripData;
+import it.uniroma2.ing.dicii.sabd.data.TripData;
 import it.uniroma2.ing.dicii.sabd.flink.query1.FlinkOutputSerializer;
-import it.uniroma2.ing.dicii.sabd.utils.KafkaProperties;
-import it.uniroma2.ing.dicii.sabd.utils.MetricSink;
-import it.uniroma2.ing.dicii.sabd.utils.MetricsGenerator;
-import it.uniroma2.ing.dicii.sabd.utils.TimeIntervalEnum;
+import it.uniroma2.ing.dicii.sabd.kafka.KafkaProperties;
+import it.uniroma2.ing.dicii.sabd.utils.timeIntervals.TimeIntervalEnum;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -17,6 +15,7 @@ import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 
 import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.Properties;
@@ -41,28 +40,15 @@ public class Query3Structure {
                         } else {
                             endDateString = tripID.substring(tripID.indexOf(" - ") + 3);
                         }
-                        //todo cancellare le stampe che non servono effettivamente
-                        if (!tripID.contains(" - ")) {
-                            System.out.println("Errore");
-                        }
 
-                        if (endDateString.isEmpty()) {
-                            System.out.println("String: " + endDateString);
-                            System.out.println("TripID: " + tripID);
-                        }
                         long endTimestamp = 0;
                         try {
                             endTimestamp = endDateFormat.parse(endDateString).getTime();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            System.out.println("String: " + endDateString);
-                            System.out.println("TripID: " + tripID);
-                            System.exit(-1);
+                        } catch (ParseException e) {
+                           e.printStackTrace();
                         }
 
                         long actualTime = tripData.getTimestamp();
-
-                        //System.out.println(Math.max(endTimestamp - actualTime + tenMinutes, tenMinutes));
 
                         return Math.max(endTimestamp - actualTime + tenMinutes, tenMinutes);
                     }
@@ -80,8 +66,6 @@ public class Query3Structure {
                 new FlinkOutputSerializer(KafkaProperties.QUERY3_TOPIC + timeIntervalEnum.getTimeIntervalName()),
                 props, FlinkKafkaProducer.Semantic.EXACTLY_ONCE))
                 .name("query3" + timeIntervalEnum.getTimeIntervalName() + "Sink").setParallelism(1);
-
-        //resultStream.addSink(new MetricSink()).setParallelism(1);
 
     }
 

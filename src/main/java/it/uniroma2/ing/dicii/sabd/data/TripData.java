@@ -1,20 +1,20 @@
-package it.uniroma2.ing.dicii.sabd;
+package it.uniroma2.ing.dicii.sabd.data;
 
-import it.uniroma2.ing.dicii.sabd.utils.GridHandler;
+import static it.uniroma2.ing.dicii.sabd.data.GridHandler.computeValidity;
 
-import static it.uniroma2.ing.dicii.sabd.utils.GridHandler.computeValidity;
+import java.io.Serializable;
 
-public class TripData {
+public class TripData implements Serializable {
 
 
-    String tripId;
-    String shipId;
-    double lat;
-    double lon;
-    long timestamp;
-    String cell;
-    String shipType;
-    long dateAsTimestamp;
+    private String tripId;
+    private String shipId;
+    private double lat;
+    private double lon;
+    private long timestamp;
+    private String cell;
+    private String shipType;
+    private long dateAsTimestamp;
     boolean isValid;
 
     public long getDateAsTimestamp() {

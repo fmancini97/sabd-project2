@@ -1,4 +1,4 @@
-package it.uniroma2.ing.dicii.sabd.utils;
+package it.uniroma2.ing.dicii.sabd.kafka;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;

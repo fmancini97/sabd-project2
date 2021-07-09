@@ -1,4 +1,4 @@
-package it.uniroma2.ing.dicii.sabd.utils;
+package it.uniroma2.ing.dicii.sabd.utils.timeIntervals;
 
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.WindowStagger;
@@ -9,9 +9,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 
-public class HourlyWindowAssigner extends TumblingEventTimeWindows {
+public class EveryTwoHoursWindowAssigner extends TumblingEventTimeWindows {
 
-    public HourlyWindowAssigner(){
+    public EveryTwoHoursWindowAssigner(){
         super(1,0, WindowStagger.ALIGNED);
     }
     /*
@@ -30,7 +30,7 @@ public class HourlyWindowAssigner extends TumblingEventTimeWindows {
 
         long startDate = calendar.getTimeInMillis();
 
-        calendar.add(Calendar.HOUR_OF_DAY,1);
+        calendar.add(Calendar.HOUR_OF_DAY,2);
 
         long endDate = calendar.getTimeInMillis()-1;
 

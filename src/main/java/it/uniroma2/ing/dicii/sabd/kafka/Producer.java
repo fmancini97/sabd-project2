@@ -1,7 +1,6 @@
-package it.uniroma2.ing.dicii.sabd;
+package it.uniroma2.ing.dicii.sabd.kafka;
 
 import it.uniroma2.ing.dicii.sabd.utils.JSONTools;
-import it.uniroma2.ing.dicii.sabd.utils.KafkaProperties;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.json.JSONArray;
@@ -107,7 +106,7 @@ public class Producer {
                 jobReady = checkJobAvailability(flinkURL);
             } catch (ConnectException e) {
                 if (attempts == MAX_ATTEMPTS) {
-                    log.log(Level.WARNING, "Error while checking flink status: {}", e.getMessage());
+                    log.log(Level.WARNING, "Error while checking flink status: {0}", e.getMessage());
                     System.exit(-1);
                 } else {
                     log.log(Level.WARNING, "Flink is not yet available");
@@ -147,7 +146,6 @@ public class Producer {
 
                 ProducerRecord<Long, String> producerRecord = new ProducerRecord<>(KafkaProperties.SOURCE_TOPIC, null, timestamp, timestamp, record);
 
-                System.out.println(record);
                 log.log(Level.FINER, "Record: {0}", record);
                 producer.send(producerRecord, (recordMetadata, e) -> {e.printStackTrace();});
             }
@@ -164,7 +162,6 @@ public class Producer {
 
     private static boolean checkJobAvailability(String flinkURL) throws IOException {
         String jobsAPIURL = String.format("http://%s/%s", flinkURL, jobsAPI);
-        System.out.println(jobsAPIURL);
         JSONObject jobsState = JSONTools.readJsonFromUrl(jobsAPIURL);
 
         JSONArray jobs = jobsState.getJSONArray("jobs");

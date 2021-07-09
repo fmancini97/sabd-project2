@@ -1,10 +1,8 @@
 package it.uniroma2.ing.dicii.sabd.flink.query2;
 
-import it.uniroma2.ing.dicii.sabd.TripData;
-import it.uniroma2.ing.dicii.sabd.utils.KafkaProperties;
-import it.uniroma2.ing.dicii.sabd.utils.MetricSink;
-import it.uniroma2.ing.dicii.sabd.utils.MetricsGenerator;
-import it.uniroma2.ing.dicii.sabd.utils.TimeIntervalEnum;
+import it.uniroma2.ing.dicii.sabd.data.TripData;
+import it.uniroma2.ing.dicii.sabd.kafka.KafkaProperties;
+import it.uniroma2.ing.dicii.sabd.utils.timeIntervals.TimeIntervalEnum;
 import it.uniroma2.ing.dicii.sabd.flink.query1.FlinkOutputSerializer;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.ReduceFunction;
@@ -12,14 +10,9 @@ import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
-import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
-import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
-import org.apache.flink.streaming.api.windowing.assigners.SlidingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
-import org.apache.flink.util.Collector;
-import org.apache.kafka.common.protocol.types.Field;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -71,7 +64,6 @@ public class Query2Structure {
                         new FlinkOutputSerializer(KafkaProperties.QUERY2_TOPIC + timeIntervalEnum.getTimeIntervalName()),
                         props, FlinkKafkaProducer.Semantic.EXACTLY_ONCE))
                 .name("query2" + timeIntervalEnum.getTimeIntervalName() + "Sink");
-        //resultStream.addSink(new MetricSink()).setParallelism(1);
     }
 
     private static String query2OutcomeToResultMap(TimeIntervalEnum timeIntervalEnum, Query2Outcome query2Outcome) {

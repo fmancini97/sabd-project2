@@ -1,7 +1,7 @@
 package it.uniroma2.ing.dicii.sabd.flink.query2;
 
-import it.uniroma2.ing.dicii.sabd.utils.GridHandler;
-import it.uniroma2.ing.dicii.sabd.utils.GridHandler.Sea;
+import it.uniroma2.ing.dicii.sabd.data.GridHandler;
+import it.uniroma2.ing.dicii.sabd.data.GridHandler.Sea;
 
 import java.util.*;
 

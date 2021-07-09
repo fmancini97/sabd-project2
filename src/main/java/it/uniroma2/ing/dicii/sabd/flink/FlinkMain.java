@@ -1,14 +1,13 @@
 package it.uniroma2.ing.dicii.sabd.flink;
 
-import it.uniroma2.ing.dicii.sabd.TripData;
+import it.uniroma2.ing.dicii.sabd.data.TripData;
 import it.uniroma2.ing.dicii.sabd.flink.query1.Query1Structure;
 import it.uniroma2.ing.dicii.sabd.flink.query2.Query2Structure;
 import it.uniroma2.ing.dicii.sabd.flink.query3.Query3Structure;
-import it.uniroma2.ing.dicii.sabd.utils.KafkaProperties;
-import it.uniroma2.ing.dicii.sabd.utils.TimeIntervalEnum;
+import it.uniroma2.ing.dicii.sabd.kafka.KafkaProperties;
+import it.uniroma2.ing.dicii.sabd.utils.timeIntervals.TimeIntervalEnum;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -68,7 +67,6 @@ public class FlinkMain {
                                     Double.parseDouble(values[4]), timestamp, Integer.parseInt(values[1]), timestamp);
                             if(data.isValid())
                                 collector.collect(data);
-
 
                         }
                 }).name("stream-data");

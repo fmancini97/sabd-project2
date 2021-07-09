@@ -1,6 +1,6 @@
 package it.uniroma2.ing.dicii.sabd.flink.query3;
 
-import it.uniroma2.ing.dicii.sabd.TripData;
+import it.uniroma2.ing.dicii.sabd.data.TripData;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;

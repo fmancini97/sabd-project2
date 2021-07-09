@@ -1,6 +1,6 @@
 package it.uniroma2.ing.dicii.sabd.flink.query3;
 
-import it.uniroma2.ing.dicii.sabd.TripData;
+import it.uniroma2.ing.dicii.sabd.data.TripData;
 import org.apache.flink.api.java.tuple.Tuple2;
 
 public class Query3Accumulator {

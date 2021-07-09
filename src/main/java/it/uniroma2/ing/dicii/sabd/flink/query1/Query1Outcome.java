@@ -1,27 +1,24 @@
 package it.uniroma2.ing.dicii.sabd.flink.query1;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Query1Outcome {
 
-    private Map<String, Integer> typeMap;
+    private HashMap<String, Integer> typeMap;
     private Date date;
     private String cellId;
 
     public Query1Outcome() {
     }
 
-    public Query1Outcome(Map<String, Set<String>> typeMapInput){
+    public Query1Outcome(HashMap<String, HashSet<String>> typeMapInput){
         this.typeMap = new HashMap<>();
         for(String shipType: typeMapInput.keySet()){
             this.typeMap.put(shipType, typeMapInput.get(shipType).size());
         }
     }
 
-    public Query1Outcome(Map<String, Integer> typeMap, Date date) {
+    public Query1Outcome(HashMap<String, Integer> typeMap, Date date) {
         this.typeMap = typeMap;
         this.date = date;
     }
@@ -30,7 +27,7 @@ public class Query1Outcome {
         return typeMap;
     }
 
-    public void setTypeMap(Map<String, Integer> typeMap) {
+    public void setTypeMap(HashMap<String, Integer> typeMap) {
         this.typeMap = typeMap;
     }
 

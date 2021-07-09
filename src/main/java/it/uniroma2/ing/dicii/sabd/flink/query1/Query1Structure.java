@@ -1,7 +1,9 @@
 package it.uniroma2.ing.dicii.sabd.flink.query1;
 
-import it.uniroma2.ing.dicii.sabd.TripData;
-import it.uniroma2.ing.dicii.sabd.utils.*;
+import it.uniroma2.ing.dicii.sabd.data.TripData;
+import it.uniroma2.ing.dicii.sabd.data.ShipTypeEnum;
+import it.uniroma2.ing.dicii.sabd.kafka.KafkaProperties;
+import it.uniroma2.ing.dicii.sabd.utils.timeIntervals.TimeIntervalEnum;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -38,9 +40,6 @@ public class Query1Structure {
                         new FlinkOutputSerializer(KafkaProperties.QUERY1_TOPIC + timeIntervalEnum.getTimeIntervalName()),
                         props, FlinkKafkaProducer.Semantic.EXACTLY_ONCE))
                 .name("query1" + timeIntervalEnum.getTimeIntervalName() + "Sink");
-        // Metric generator
-        //resultStream.addSink(new MetricSink()).setParallelism(1);
-
     }
 
     private static String query1OutcomeToResultMap(TimeIntervalEnum timeIntervalEnum, Query1Outcome query1Outcome) {
@@ -53,12 +52,6 @@ public class Query1Structure {
 
         int daysOfActualTimeInterval = timeIntervalEnum.getNumDays(date);
 
-        /*
-        //todo stampare tutte le tipologie di navi, anche quelle con v=0
-        query1Outcome.getTypeMap().forEach((k,v) -> {
-            builder.append(",").append(k).append(",").append(String.format(Locale.ENGLISH, "%.2g",(double)v/daysOfActualTimeInterval));
-        });
-        */
 
         for(ShipTypeEnum shipType: ShipTypeEnum.values()){
             Integer v = query1Outcome.getTypeMap().get(shipType.getShipType());

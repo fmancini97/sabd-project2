@@ -1,6 +1,6 @@
 package it.uniroma2.ing.dicii.sabd.flink.query2;
 
-import it.uniroma2.ing.dicii.sabd.TripData;
+import it.uniroma2.ing.dicii.sabd.data.TripData;
 import org.apache.flink.api.common.functions.AggregateFunction;
 
 public class Query2IntermediateAggregator implements AggregateFunction<TripData, Query2IntermediateAccumulator, Query2IntermediateOutcome> {
