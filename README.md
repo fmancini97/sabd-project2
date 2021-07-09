@@ -59,7 +59,7 @@ submit-job.sh [<parallelism>]
 - [<img src="https://secure.gravatar.com/avatar/31cea69afa424609b2d83621b4d47f1d.jpg?s=80&r=g&d=mm" width=70px>](https://grafana.com/)
   - Web UI port: 3000
 
-##Results
+## Results
 
 Results are stored in [*Results*](https://github.com/fmancini97/sabd-project2/tree/main/Results) folder.
 
