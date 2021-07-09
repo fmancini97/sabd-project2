@@ -29,6 +29,7 @@ public class KafkaProperties {
         props.put(ProducerConfig.CLIENT_ID_CONFIG, "flink-producer");
         // start reading from beginning of partition if no offset was created
         // exactly once semantic
+        props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
         // key and value deserializers
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, LongSerializer.class.getName());
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
@@ -43,8 +44,9 @@ public class KafkaProperties {
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "flink1");
         // start reading from beginning of partition if no offset was created
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+
         // exactly once semantic
-        //props.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, true);
+        props.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");
 
         // key and value deserializers
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, LongDeserializer.class.getName());
@@ -74,6 +76,7 @@ public class KafkaProperties {
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         // exactly once semantic
         props.put(ConsumerConfig.METADATA_MAX_AGE_CONFIG, 5000);
+        props.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");
 
         // key and value deserializers
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, LongDeserializer.class.getName());

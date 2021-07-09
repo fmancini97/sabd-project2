@@ -9,10 +9,13 @@ import it.uniroma2.ing.dicii.sabd.utils.timeIntervals.TimeIntervalEnum;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.util.Collector;
+import org.apache.flink.streaming.api.windowing.time.Time;
+
 
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
@@ -80,8 +83,8 @@ public class FlinkMain {
                 Query2Structure.build(stream,timeIntervalEnum);
             }
 
-            for (TimeIntervalEnum timeIntervalEnum: Arrays.asList(TimeIntervalEnum.HOURLY, TimeIntervalEnum.EVERYTWOHOURS)) {
-                Query3Structure.build(stream, timeIntervalEnum);
+            for (Tuple2<String, Time> timeTuple2: Arrays.asList(new Tuple2<>("Hourly", Time.hours(1)), new Tuple2<>("EveryTwoHours", Time.hours(2)))) {
+                Query3Structure.build(stream, timeTuple2.f0, timeTuple2.f1);
             }
 
         } catch (InvocationTargetException | InstantiationException |  IllegalAccessException | NoSuchMethodException e) {

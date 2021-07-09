@@ -13,6 +13,7 @@ import org.apache.flink.streaming.api.windowing.assigners.SessionWindowTimeGapEx
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
+import scala.Int;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -26,11 +27,7 @@ import java.util.Properties;
  */
 public class Query3Structure {
 
-    public static void build(DataStream<TripData> stream, TimeIntervalEnum timeIntervalEnum) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
-
-        Constructor<? extends TumblingEventTimeWindows> timeIntervalConstructor = null;
-
-        timeIntervalConstructor = timeIntervalEnum.getTimeIntervalClass().getConstructor();
+    public static void build(DataStream<TripData> stream, String durationName, Time duration) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
 
         Properties props = KafkaProperties.getFlinkProducerProperties();
 
@@ -63,16 +60,17 @@ public class Query3Structure {
                 }))
                 .trigger(SessionWindowTrigger.create())
                 .aggregate(new Query3Aggregator(), new Query3Window())
-                .name("query3" + timeIntervalEnum.getTimeIntervalName() + "-computeDistance")
-                .assignTimestampsAndWatermarks(WatermarkStrategy.<Tuple3<String, Long, Double>>forMonotonousTimestamps().withTimestampAssigner((event, timestamp) -> event.f1).withIdleness(Duration.ofMillis(35)))
-                .windowAll(timeIntervalConstructor.newInstance())
+                .name("query3" + durationName + "-computeDistance")
+                .assignTimestampsAndWatermarks(WatermarkStrategy.<Tuple3<String, Long, Double>>forMonotonousTimestamps().withTimestampAssigner((event, timestamp) -> event.f1))
+                .windowAll(TumblingEventTimeWindows.of(duration))
+                .allowedLateness(Time.minutes(30))
                 .aggregate(new Query3Ranking(), new Query3RankWindow())
-                .name("query3" + timeIntervalEnum.getTimeIntervalName() + "-rank");
+                .name("query3" + durationName + "-rank");
 
-        resultStream.addSink(new FlinkKafkaProducer<>(KafkaProperties.QUERY3_TOPIC + timeIntervalEnum.getTimeIntervalName(),
-                new FlinkOutputSerializer(KafkaProperties.QUERY3_TOPIC + timeIntervalEnum.getTimeIntervalName()),
+        resultStream.addSink(new FlinkKafkaProducer<>(KafkaProperties.QUERY3_TOPIC + durationName,
+                new FlinkOutputSerializer(KafkaProperties.QUERY3_TOPIC + durationName),
                 props, FlinkKafkaProducer.Semantic.EXACTLY_ONCE))
-                .name("query3" + timeIntervalEnum.getTimeIntervalName() + "-sink").setParallelism(1);
+                .name("query3" + durationName + "-sink").setParallelism(1);
 
     }
 
