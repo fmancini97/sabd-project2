@@ -3,7 +3,7 @@ dir="$( dirname "$0" )"
 
 PARALLELISM=1
 
-if [[ $1 =~ ^-?[0-9]+$ ]]; then
+if [[ $1 =~ ^-?[0-9]+$ ]]  && (( $1 >= 1)); then
    PARALLELISM=$1
 fi
 echo "Submitting job with parallelism equal to $PARALLELISM"
