@@ -4,6 +4,10 @@ import static it.uniroma2.ing.dicii.sabd.data.GridHandler.computeValidity;
 
 import java.io.Serializable;
 
+
+/**
+ * It maintains the data of a single record transmitted by the Automatic Identification System
+ */
 public class TripData implements Serializable {
 
 

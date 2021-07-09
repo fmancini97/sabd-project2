@@ -9,6 +9,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 
+/**
+ * Monthly Tumbling Event Time Window aligned to first day of the month
+ */
 public class MonthlyWindowAssigner extends TumblingEventTimeWindows {
 
     public MonthlyWindowAssigner(){

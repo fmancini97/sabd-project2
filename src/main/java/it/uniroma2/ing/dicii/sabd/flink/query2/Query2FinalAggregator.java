@@ -2,6 +2,9 @@ package it.uniroma2.ing.dicii.sabd.flink.query2;
 
 import org.apache.flink.api.common.functions.AggregateFunction;
 
+/**
+ * It aggregates cells attendances using Query2Outcome as accumulator
+ */
 public class Query2FinalAggregator implements AggregateFunction<Query2IntermediateOutcome, Query2Outcome, Query2Outcome> {
     @Override
     public Query2Outcome createAccumulator() {

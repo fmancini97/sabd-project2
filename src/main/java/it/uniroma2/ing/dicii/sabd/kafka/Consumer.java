@@ -11,6 +11,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+
+/**
+ * It writes each record in input on a different file based on the topic from which it has read it
+ */
 public class Consumer {
 
     private static final String query1Header = "ts,id_cella,ship_t35,agv_t35,ship_t60-69,agv_t60-69,ship_t70-79,agv_t70-79,ship_to,agv_to\n";

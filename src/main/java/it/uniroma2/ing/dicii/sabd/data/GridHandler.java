@@ -1,5 +1,8 @@
 package it.uniroma2.ing.dicii.sabd.data;
 
+/**
+ * It manages the grid over the mediterranean sea
+ */
 public class GridHandler {
 
     public enum Sea{

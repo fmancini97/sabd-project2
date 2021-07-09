@@ -23,7 +23,9 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
+/**
+ * It builds Flink topology
+ */
 public class FlinkMain {
 
 

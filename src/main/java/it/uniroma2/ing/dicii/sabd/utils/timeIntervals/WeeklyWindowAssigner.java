@@ -9,6 +9,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 
+/**
+ * Weekly Tumbling Event Time Window aligned to first day of the week
+ */
 public class WeeklyWindowAssigner extends TumblingEventTimeWindows {
 
     public WeeklyWindowAssigner(){

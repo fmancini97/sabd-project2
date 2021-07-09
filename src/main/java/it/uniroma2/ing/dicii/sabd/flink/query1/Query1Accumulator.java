@@ -3,6 +3,9 @@ package it.uniroma2.ing.dicii.sabd.flink.query1;
 import java.io.Serializable;
 import java.util.*;
 
+/**
+ * For each cell, it maintains the sets of trips over the cell based on the ship type
+ */
 public class Query1Accumulator implements Serializable {
 
     //mappa (tiponave - set(tripid))

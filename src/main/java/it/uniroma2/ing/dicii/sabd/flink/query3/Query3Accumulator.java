@@ -3,27 +3,32 @@ package it.uniroma2.ing.dicii.sabd.flink.query3;
 import it.uniroma2.ing.dicii.sabd.data.TripData;
 import org.apache.flink.api.java.tuple.Tuple2;
 
+
+/**
+ * It mantains the starting position for each Trip and computes the actual distance between
+ * the starting position and the actual position
+ */
 public class Query3Accumulator {
 
     private Double distance;
-    private Tuple2<Double, Double> lastPos; //lat lon
+    private Tuple2<Double, Double> startPos; //lat lon
     private static final double RADIUS = 6378.388;
     private long lastTimestamp;
 
 
     public Query3Accumulator() {
         this.distance = 0.0;
-        this.lastPos = null;
+        this.startPos = null;
     }
 
     public void add(TripData data) {
 
         Tuple2<Double,Double> pos = new Tuple2<>(data.getLat(), data.getLon());
-        if (this.lastPos == null) {
-            this.lastPos = pos;
+        if (this.startPos == null) {
+            this.startPos = pos;
         }
 
-        this.distance = this.computeDistance(this.lastPos, pos);
+        this.distance = this.computeDistance(this.startPos, pos);
 
         this.lastTimestamp = data.getTimestamp();
     }

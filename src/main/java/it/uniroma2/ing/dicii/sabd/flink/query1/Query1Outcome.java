@@ -2,6 +2,9 @@ package it.uniroma2.ing.dicii.sabd.flink.query1;
 
 import java.util.*;
 
+/**
+ * For each cell, it maintains the average number of trips over the cell based on the ship type
+ */
 public class Query1Outcome {
 
     private HashMap<String, Integer> typeMap;

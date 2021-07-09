@@ -9,16 +9,16 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 
+
+/**
+ * 2 Hours Tumbling Event Time Window aligned to first minute of the first hour
+ */
 public class EveryTwoHoursWindowAssigner extends TumblingEventTimeWindows {
 
     public EveryTwoHoursWindowAssigner(){
         super(1,0, WindowStagger.ALIGNED);
     }
-    /*
-    protected MonthlyWindowAssigner(long size, long offset, WindowStagger windowStagger) {
-        super(size, offset, windowStagger);
-    }
-    */
+
     @Override
     public Collection<TimeWindow> assignWindows(Object o, long timestamp, WindowAssignerContext context){
         Calendar calendar = Calendar.getInstance();

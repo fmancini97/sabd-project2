@@ -3,6 +3,9 @@ package it.uniroma2.ing.dicii.sabd.flink.query2;
 import it.uniroma2.ing.dicii.sabd.data.TripData;
 import org.apache.flink.api.common.functions.AggregateFunction;
 
+/**
+ * It aggregate cell attendance values for a single cell
+ */
 public class Query2IntermediateAggregator implements AggregateFunction<TripData, Query2IntermediateAccumulator, Query2IntermediateOutcome> {
 
 

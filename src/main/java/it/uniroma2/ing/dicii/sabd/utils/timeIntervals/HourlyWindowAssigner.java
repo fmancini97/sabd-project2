@@ -9,6 +9,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 
+/**
+ * Hourly Tumbling Event Time Window aligned to first minute of the hour
+ */
 public class HourlyWindowAssigner extends TumblingEventTimeWindows {
 
     public HourlyWindowAssigner(){

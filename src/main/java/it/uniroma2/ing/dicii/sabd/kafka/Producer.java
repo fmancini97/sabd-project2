@@ -17,7 +17,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
+/**
+ * It takes the dataset and replay each tuple in the dataset on a kafka topic scaling the time proportionally
+ */
 public class Producer {
     private static final SimpleDateFormat[] dateFormats = {new SimpleDateFormat("dd/MM/yy HH:mm"),
             new SimpleDateFormat("dd-MM-yy HH:mm")};

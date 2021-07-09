@@ -17,7 +17,9 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Properties;
 
-
+/**
+ * It implements query1 logic
+ */
 public class Query1Structure {
 
     public static void build(DataStream<TripData> stream, TimeIntervalEnum timeIntervalEnum) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {

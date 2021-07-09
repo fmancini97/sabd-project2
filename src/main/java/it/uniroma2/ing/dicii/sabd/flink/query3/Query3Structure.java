@@ -14,15 +14,23 @@ import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindo
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.Properties;
 
+/**
+ * It implements query3 logic
+ */
 public class Query3Structure {
 
     public static void build(DataStream<TripData> stream, TimeIntervalEnum timeIntervalEnum) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+
+        Constructor<? extends TumblingEventTimeWindows> timeIntervalConstructor = null;
+
+        timeIntervalConstructor = timeIntervalEnum.getTimeIntervalClass().getConstructor();
 
         Properties props = KafkaProperties.getFlinkProducerProperties();
 
@@ -57,7 +65,7 @@ public class Query3Structure {
                 .aggregate(new Query3Aggregator(), new Query3Window())
                 .name("query3" + timeIntervalEnum.getTimeIntervalName() + "-computeDistance")
                 .assignTimestampsAndWatermarks(WatermarkStrategy.<Tuple3<String, Long, Double>>forMonotonousTimestamps().withTimestampAssigner((event, timestamp) -> event.f1).withIdleness(Duration.ofMillis(35)))
-                .windowAll(TumblingEventTimeWindows.of(Time.hours(1)))
+                .windowAll(timeIntervalConstructor.newInstance())
                 .aggregate(new Query3Ranking(), new Query3RankWindow())
                 .name("query3" + timeIntervalEnum.getTimeIntervalName() + "-rank");
 

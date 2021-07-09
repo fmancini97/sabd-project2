@@ -4,6 +4,9 @@ import it.uniroma2.ing.dicii.sabd.data.TripData;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 
+/**
+ * Aggregator used with Query3Accumulator
+ */
 public class Query3Aggregator implements AggregateFunction<TripData, Query3Accumulator, Tuple2<Long, Double>> {
 
 

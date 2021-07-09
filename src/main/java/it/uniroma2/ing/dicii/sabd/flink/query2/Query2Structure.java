@@ -19,6 +19,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * It implements query2 logic
+ */
 public class Query2Structure {
 
 

@@ -9,6 +9,9 @@ import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.util.Properties;
 
+/**
+ * Handle Kafka Properties
+ */
 public class KafkaProperties {
 
 

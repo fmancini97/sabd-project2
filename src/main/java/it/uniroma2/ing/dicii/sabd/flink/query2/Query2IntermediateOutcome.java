@@ -5,6 +5,9 @@ import it.uniroma2.ing.dicii.sabd.data.GridHandler.Sea;
 
 import java.util.*;
 
+/**
+ * It maintains the attendance of a single cell
+ */
 public class Query2IntermediateOutcome {
 
 

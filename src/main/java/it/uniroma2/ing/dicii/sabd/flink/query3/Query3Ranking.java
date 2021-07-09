@@ -4,6 +4,9 @@ import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 
+/**
+ * Aggregator for ranking
+ */
 public class Query3Ranking implements AggregateFunction<Tuple3<String, Long, Double>, Query3RankAccumulator, String> {
 
 
@@ -18,13 +21,15 @@ public class Query3Ranking implements AggregateFunction<Tuple3<String, Long, Dou
         return query3RankAccumulator;
     }
 
-    @Override
-    public String getResult(Query3RankAccumulator query3RankAccumulator) {
-        return query3RankAccumulator.getResult();
-    }
 
     @Override
     public Query3RankAccumulator merge(Query3RankAccumulator query3RankAccumulator, Query3RankAccumulator acc1) {
         return null;
     }
+
+    @Override
+    public String getResult(Query3RankAccumulator query3RankAccumulator) {
+        return query3RankAccumulator.getResult();
+    }
+
 }

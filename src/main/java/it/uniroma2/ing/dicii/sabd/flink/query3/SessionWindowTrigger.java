@@ -5,7 +5,9 @@ import org.apache.flink.streaming.api.windowing.triggers.Trigger;
 import org.apache.flink.streaming.api.windowing.triggers.TriggerResult;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 
-
+/**
+ * It implements a custom Trigger for a SessionWindow
+ */
 public class SessionWindowTrigger extends Trigger<Object, TimeWindow> {
 
     private final EventTimeTrigger eventTimeTrigger;

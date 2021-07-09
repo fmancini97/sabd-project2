@@ -5,6 +5,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * It mantains top3 for both 00:00-11:59 and 12:00-23:59 intervals
+ */
 public class Query2Outcome {
 
     private Date date;

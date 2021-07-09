@@ -4,6 +4,10 @@ import org.apache.flink.api.java.tuple.Tuple2;
 
 import java.util.*;
 
+/**
+ * Accumulator for ranking: it maintains a top 5 of key-value pairs.
+ * The top 5 is computed on the content of the value field.
+ */
 public class Query3RankAccumulator {
 
     private final static int SIZE = 5;
